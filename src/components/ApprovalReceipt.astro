@@ -1,0 +1,40 @@
+---
+import SourceChip from './SourceChip.astro';
+---
+
+<div class="receipt">
+  <div class="receipt__head">
+    <div>
+      <p class="receipt__label">Approval receipt</p>
+      <p class="receipt__title">Stage change · Proposal</p>
+    </div>
+    <SourceChip label="Human-approved" tone="sage" />
+  </div>
+
+  <dl class="receipt__rows">
+    <div>
+      <dt>Source</dt>
+      <dd>Voice note 01 · 14:32</dd>
+    </div>
+    <div>
+      <dt>Proposed by</dt>
+      <dd>Klozdesk · model v0.4</dd>
+    </div>
+    <div>
+      <dt>Reviewed by</dt>
+      <dd>Ada O. · Sales lead</dd>
+    </div>
+    <div>
+      <dt>Approved</dt>
+      <dd>18 Nov 2026 · 14:36</dd>
+    </div>
+    <div>
+      <dt>Result</dt>
+      <dd>Deal updated · email queued</dd>
+    </div>
+  </dl>
+
+  <p class="receipt__note">
+    Every material claim keeps its source. Every high-impact change keeps its approval.
+  </p>
+</div>

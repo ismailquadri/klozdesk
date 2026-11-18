@@ -1,0 +1,56 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" aria-label="Klozdesk home">
+          <Logo variant="reversed" width={150} />
+        </a>
+        <p>
+          The Deal Brain for Nigerian high-ticket sales. Less paperwork. More selling.
+        </p>
+      </div>
+
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/product">How it works</a></li>
+          <li><a href="/pricing">Pilot program</a></li>
+          <li><a href="/trust">Trust &amp; security</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>
+        © {year} Klozdesk. Built in Nigeria. Klozdesk is a product of Sparkr Digitals.
+      </p>
+      <p>
+        Pre-launch. We publish what we have proven—not badges we have not earned.
+      </p>
+    </div>
+  </div>
+</footer>

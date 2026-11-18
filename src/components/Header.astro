@@ -1,0 +1,75 @@
+---
+import Logo from './Logo.astro';
+import Button from './Button.astro';
+import { site } from '../data/site';
+---
+
+<header class="site-header" data-header>
+  <div class="shell header-inner">
+    <a href="/" class="brand" aria-label="Klozdesk home">
+      <Logo width={150} loading="eager" />
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      {site.nav.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <Button href="/contact" variant="primary">Apply for the pilot</Button>
+      <button
+        class="menu-button"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-button
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-menu" aria-label="Mobile" data-menu>
+    {site.nav.map((item) => (
+      <a href={item.href}>{item.label}</a>
+    ))}
+    <Button href="/contact" variant="primary">Apply for the pilot</Button>
+  </nav>
+</header>
+
+<script>
+  const header = document.querySelector('[data-header]');
+  const menuButton = document.querySelector('[data-menu-button]');
+  const menu = document.querySelector('[data-menu]');
+
+  const syncHeader = () => {
+    header?.toggleAttribute('data-scrolled', window.scrollY > 8);
+  };
+
+  syncHeader();
+  window.addEventListener('scroll', syncHeader, { passive: true });
+
+  const closeMenu = () => {
+    menu?.removeAttribute('data-open');
+    menuButton?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  };
+
+  menuButton?.addEventListener('click', () => {
+    const isOpen = menu?.toggleAttribute('data-open') ?? false;
+    menuButton.setAttribute('aria-expanded', String(isOpen));
+    document.body.classList.toggle('menu-open', isOpen);
+  });
+
+  menu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 960) closeMenu();
+  });
+</script>

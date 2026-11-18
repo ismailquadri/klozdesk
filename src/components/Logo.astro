@@ -1,0 +1,26 @@
+---
+interface Props {
+  variant?: 'light' | 'reversed';
+  width?: number;
+  loading?: 'eager' | 'lazy';
+  class?: string;
+}
+
+const { variant = 'light', width = 160, loading = 'lazy', class: className } = Astro.props;
+const base = variant === 'reversed' ? '/brand/logo-reversed' : '/brand/logo';
+const src = `${base}-600.png`;
+const srcset = `${base}-320.png 320w, ${base}-600.png 600w, ${base}-1200.png 1200w`;
+const height = Math.round(width / (5538 / 1013));
+---
+
+<img
+  src={src}
+  srcset={srcset}
+  sizes={`${width}px`}
+  width={width}
+  height={height}
+  alt="Klozdesk"
+  class={className}
+  decoding="async"
+  loading={loading}
+/>

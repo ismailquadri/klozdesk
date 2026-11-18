@@ -1,0 +1,277 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import SourceChip from '../components/SourceChip.astro';
+import DealEvidence from '../components/DealEvidence.astro';
+import ApprovalReceipt from '../components/ApprovalReceipt.astro';
+import CTA from '../components/CTA.astro';
+---
+
+<BaseLayout
+  title="Product"
+  description="One workflow: authorized capture, source-linked extraction, visible review, exact approval, and a durable deal record. Klozdesk makes the CRM true."
+>
+  <section class="page-hero">
+    <div class="shell">
+      <Eyebrow>Product</Eyebrow>
+      <h1>One workflow. <em>Every fact accounted for.</em></h1>
+      <p class="lede">
+        Klozdesk is not a chatbot and not another dashboard. It is the evidence layer between a
+        conversation and the CRM record—built so a sales team can trust what it sees.
+      </p>
+      <div class="hero-actions">
+        <Button href="/contact" variant="primary">Apply for the pilot</Button>
+        <Button href="/pricing" variant="ghost">See the pilot</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>The loop</Eyebrow>
+          <h2>Five steps. <em>No silent changes.</em></h2>
+        </div>
+        <p class="lede">
+          The product is designed around one question: what would it take for a busy rep to trust
+          the record without doing more paperwork?
+        </p>
+      </div>
+
+      <div class="mt-3">
+        <article class="detail-grid">
+          <div class="detail-copy">
+            <span class="detail-num">01</span>
+            <h3>Capture the moment.</h3>
+            <p class="lede">
+              A rep records a voice note after a site visit, forwards a selected email, or uploads
+              a debrief. Consent is recorded before the source enters the workspace.
+            </p>
+            <p class="small">
+              No always-on recording. No personal WhatsApp scraping. The team decides which
+              channels and which people are in scope.
+            </p>
+          </div>
+          <div class="detail-visual">
+            <div class="mini-card">
+              <div class="mini-card__head">
+                <div>
+                  <p class="mini-card__title">New source</p>
+                  <p class="mini-card__meta">Voice note · 1m 48s · Field visit</p>
+                </div>
+                <SourceChip label="Consent recorded" tone="sage" />
+              </div>
+              <p class="source-block__quote">
+                “They want the 40kW system, but the MD wants the financing split over 18 months.”
+              </p>
+              <div class="timeline mt-1">
+                <div class="timeline__item">
+                  <h4>Source stored</h4>
+                  <p>Encrypted at rest. Linked to the deal and the rep.</p>
+                </div>
+                <div class="timeline__item">
+                  <h4>Processing queued</h4>
+                  <p>Transcription and extraction run as a durable background job.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="detail-grid">
+          <div class="detail-copy">
+            <span class="detail-num">02</span>
+            <h3>Extract only what the source supports.</h3>
+            <p class="lede">
+              Klozdesk proposes amounts, dates, stages, objections, and next steps. Each claim
+              carries the timestamp and the exact source span behind it.
+            </p>
+            <p class="small">
+              If the source is ambiguous, the field is flagged for confirmation instead of being
+              guessed into the CRM.
+            </p>
+          </div>
+          <div class="detail-visual">
+            <div class="mini-card">
+              <div class="mini-card__head">
+                <div>
+                  <p class="mini-card__title">Proposed claims</p>
+                  <p class="mini-card__meta">From Source 01 · Voice note</p>
+                </div>
+                <SourceChip label="3 claims" tone="violet" />
+              </div>
+              <div class="claim-table">
+                <div class="claim-row">
+                  <span class="claim-row__field">Amount</span>
+                  <span class="claim-row__value">NGN 14.5m</span>
+                  <SourceChip label="00:42" tone="clay" />
+                </div>
+                <div class="claim-row">
+                  <span class="claim-row__field">Stage</span>
+                  <span class="claim-row__value">Proposal</span>
+                  <SourceChip label="00:18" tone="violet" />
+                </div>
+                <div class="claim-row">
+                  <span class="claim-row__field">Next step</span>
+                  <span class="claim-row__value">Send financing options</span>
+                  <SourceChip label="01:12" tone="sage" />
+                </div>
+                <div class="claim-row">
+                  <span class="claim-row__field">Blocker</span>
+                  <span class="claim-row__value">18-month split</span>
+                  <SourceChip label="00:51" tone="violet" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="detail-grid">
+          <div class="detail-copy">
+            <span class="detail-num">03</span>
+            <h3>Review the diff, not a wall of text.</h3>
+            <p class="lede">
+              The rep sees exactly what would change: old value, proposed value, source, and
+              uncertainty. Nothing is written until a person accepts it.
+            </p>
+            <p class="small">
+              The review is designed for a phone in the field, not a desktop analyst with twenty
+              minutes to spare.
+            </p>
+          </div>
+          <div class="detail-visual">
+            <DealEvidence />
+          </div>
+        </article>
+
+        <article class="detail-grid">
+          <div class="detail-copy">
+            <span class="detail-num">04</span>
+            <h3>Approve the exact action.</h3>
+            <p class="lede">
+              Email, stage, discount, and sensitive-data changes require an explicit approval.
+              “Approve all” is not the default.
+            </p>
+            <p class="small">
+              Every approval records who approved what, when, and against which source. The
+              receipt is the product, not a compliance afterthought.
+            </p>
+          </div>
+          <div class="detail-visual">
+            <ApprovalReceipt />
+          </div>
+        </article>
+
+        <article class="detail-grid">
+          <div class="detail-copy">
+            <span class="detail-num">05</span>
+            <h3>Keep the record, the evidence, and the history together.</h3>
+            <p class="lede">
+              The deal is not a status field. It is a timeline of sources, proposed changes,
+              approvals, and outcomes that the next person can actually use.
+            </p>
+            <p class="small">
+              Exportable. Auditable. Reversible. The customer keeps ownership of the record.
+            </p>
+          </div>
+          <div class="detail-visual">
+            <div class="mini-card">
+              <div class="mini-card__head">
+                <div>
+                  <p class="mini-card__title">Deal timeline</p>
+                  <p class="mini-card__meta">Orbit Solar · 40kW commercial</p>
+                </div>
+                <SourceChip label="Audit trail" tone="muted" />
+              </div>
+              <div class="timeline mt-1">
+                <div class="timeline__item">
+                  <h4>14:32 · Voice note captured</h4>
+                  <p>Source stored with consent. Linked to Ada O.</p>
+                </div>
+                <div class="timeline__item">
+                  <h4>14:33 · 3 changes proposed</h4>
+                  <p>Amount flagged for confirmation. Stage and next step supported by source.</p>
+                </div>
+                <div class="timeline__item">
+                  <h4>14:36 · Approved by Ada</h4>
+                  <p>Stage and next step accepted. Amount left unchanged pending confirmation.</p>
+                </div>
+                <div class="timeline__item">
+                  <h4>14:36 · CRM updated</h4>
+                  <p>Email queued. Provider acceptance is not delivery confirmation.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper-2">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>What it is not</Eyebrow>
+          <h2>Not another <em>AI sales toy.</em></h2>
+        </div>
+        <p class="lede">
+          We are deliberately unglamorous: fewer agents, fewer autonomous actions, more evidence.
+          The product earns trust by doing less, visibly.
+        </p>
+      </div>
+
+      <div class="not-grid" data-reveal>
+        <article class="not-card">
+          <h3>Not a chatbot.</h3>
+          <p>You do not talk to Klozdesk all day. It works in the background of the deal.</p>
+        </article>
+        <article class="not-card">
+          <h3>Not an autonomous SDR.</h3>
+          <p>No cold outreach, no auto-send, no sequences. Every outbound message is approved.</p>
+        </article>
+        <article class="not-card">
+          <h3>Not a CRM replacement on day one.</h3>
+          <p>Keep the CRM you have. Klozdesk becomes the evidence layer that makes it true.</p>
+        </article>
+        <article class="not-card">
+          <h3>Not a black box.</h3>
+          <p>Every material claim has a source. Every high-impact change has an approval.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell brain-grid">
+      <div data-reveal>
+        <Eyebrow>Integration posture</Eyebrow>
+        <h2>Keep your CRM. <em>Make it true.</em></h2>
+        <p class="lede mt-1">
+          Klozdesk is designed to sit alongside the CRM you already use. The pilot scopes one
+          integration path and tests it against real deal data before we claim support.
+        </p>
+        <p class="small mt-1">
+          Integration depth is part of the pilot. We do not claim a live integration until it is
+          tested, documented, and safe to operate.
+        </p>
+      </div>
+      <div data-reveal>
+        <div class="crm-row">
+          <span class="crm-pill">Zoho CRM</span>
+          <span class="crm-pill">HubSpot</span>
+          <span class="crm-pill">Attio</span>
+          <span class="crm-pill">Your internal tool</span>
+        </div>
+        <div class="callout mt-2">
+          The first pilot integration is chosen with the design partner—not promised in advance.
+          Export and manual capture are available from day one.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTA />
+</BaseLayout>

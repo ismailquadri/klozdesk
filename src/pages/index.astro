@@ -1,0 +1,250 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import DealEvidence from '../components/DealEvidence.astro';
+import ApprovalReceipt from '../components/ApprovalReceipt.astro';
+import SourceChip from '../components/SourceChip.astro';
+import CTA from '../components/CTA.astro';
+---
+
+<BaseLayout
+  title="Less paperwork. More selling."
+  description="Klozdesk is the Deal Brain for Nigerian high-ticket sales. Authorized conversations become a source-linked deal record and an approved next action."
+>
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <Eyebrow>The Deal Brain for Nigerian high-ticket sales</Eyebrow>
+        <h1>Less paperwork.<br /><em>More selling.</em></h1>
+        <p class="lede">
+          Klozdesk turns authorized conversations into a source-linked deal record and an
+          approved next action—so your CRM is finally true.
+        </p>
+        <div class="hero-actions">
+          <Button href="/contact" variant="primary">Apply for the pilot</Button>
+          <Button href="/product" variant="ghost">See the workflow</Button>
+        </div>
+        <p class="hero-note">Built for teams with 5+ reps. Starting with solar and EPC.</p>
+      </div>
+
+      <div class="hero-visual">
+        <DealEvidence />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>The gap</Eyebrow>
+          <h2>The deal is in the conversation.<br /><em>The CRM is not.</em></h2>
+        </div>
+        <p class="lede">
+          High-ticket sales runs on site visits, voice notes, WhatsApp threads, and quotes. The
+          record is reconstructed later—if it is reconstructed at all.
+        </p>
+      </div>
+
+      <div class="problem-grid" data-reveal>
+        <article class="problem-item">
+          <span class="problem-num">01</span>
+          <h3>It happens in the field.</h3>
+          <p>
+            A rep leaves a site visit with the real context in a voice note: the budget, the
+            blocker, the decision-maker, the next step.
+          </p>
+        </article>
+        <article class="problem-item">
+          <span class="problem-num">02</span>
+          <h3>It gets rebuilt from memory.</h3>
+          <p>
+            Hours later, someone pieces the deal together for the CRM. Detail drops. Nuance
+            disappears. The next person starts from a summary of a summary.
+          </p>
+        </article>
+        <article class="problem-item">
+          <span class="problem-num">03</span>
+          <h3>The record goes stale.</h3>
+          <p>
+            The pipeline shows a stage, not the truth. Forecasts, handoffs, and follow-ups
+            inherit the gap.
+          </p>
+        </article>
+      </div>
+
+      <p class="problem-close" data-reveal>
+        Klozdesk closes the distance between <em>what was said</em> and
+        <em>what the CRM knows.</em>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--paper-2">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>One workflow</Eyebrow>
+          <h2>From conversation to <em>approved action.</em></h2>
+        </div>
+        <p class="lede">
+          No new dashboard to feed. No autonomous outreach. Five steps, each with a visible
+          source and a human decision.
+        </p>
+      </div>
+
+      <div class="workflow" data-reveal>
+        <article class="step">
+          <span class="step__num">01</span>
+          <h3>Capture</h3>
+          <p>Authorized voice note, field debrief, or selected email.</p>
+          <SourceChip label="Consent-first" tone="violet" />
+        </article>
+        <article class="step">
+          <span class="step__num">02</span>
+          <h3>Extract</h3>
+          <p>Amounts, dates, objections, and next steps—each tied to the moment it came from.</p>
+          <SourceChip label="Source-linked" tone="violet" />
+        </article>
+        <article class="step">
+          <span class="step__num">03</span>
+          <h3>Review</h3>
+          <p>A before-and-after diff. Nothing changes silently.</p>
+          <SourceChip label="Visible diff" tone="clay" />
+        </article>
+        <article class="step">
+          <span class="step__num">04</span>
+          <h3>Approve</h3>
+          <p>Exact approval for email, stage, discount, or sensitive data.</p>
+          <SourceChip label="Human-approved" tone="sage" />
+        </article>
+        <article class="step">
+          <span class="step__num">05</span>
+          <h3>Record</h3>
+          <p>The deal, the evidence, and the approval history stay together.</p>
+          <SourceChip label="Audit trail" tone="muted" />
+        </article>
+      </div>
+
+      <div class="mt-2" data-reveal>
+        <a class="text-link" href="/product">See the full workflow <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--ink">
+    <div class="shell trust-grid">
+      <div data-reveal>
+        <Eyebrow tone="paper">Trust is the feature</Eyebrow>
+        <h2>AI that shows <em>its receipts.</em></h2>
+        <p class="lede">
+          Most AI sales tools ask you to trust the output. Klozdesk shows you the source, the
+          change, and the approval—or it abstains.
+        </p>
+
+        <div class="trust-list">
+          <div class="trust-item">
+            <h3>Source-linked claims</h3>
+            <p>Every material fact points to the voice note, email, or debrief it came from.</p>
+          </div>
+          <div class="trust-item">
+            <h3>Human approval</h3>
+            <p>Outbound messages and high-impact changes wait for a person. No silent sends.</p>
+          </div>
+          <div class="trust-item">
+            <h3>Reversible changes</h3>
+            <p>Every update keeps a before-and-after and an audit trail.</p>
+          </div>
+          <div class="trust-item">
+            <h3>Tenant isolation</h3>
+            <p>Workspace boundaries are enforced server-side, not by the interface.</p>
+          </div>
+        </div>
+
+        <p class="trust-foot">
+          We do not claim zero hallucinations. We design for visible uncertainty: cite, abstain,
+          or ask a human.
+        </p>
+      </div>
+
+      <div data-reveal>
+        <ApprovalReceipt />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>Who it’s for</Eyebrow>
+          <h2>Teams selling deals that <em>cannot afford a stale record.</em></h2>
+        </div>
+        <p class="lede">
+          We are not building for every sales team. We are building for the ones where a missed
+          detail costs more than a software subscription.
+        </p>
+      </div>
+
+      <div class="who-grid" data-reveal>
+        <article class="who-card">
+          <p class="who-card__label">Beachhead</p>
+          <h3>Solar &amp; EPC</h3>
+          <p>Site surveys, quotes, financing, procurement, and multiple decision-makers.</p>
+        </article>
+        <article class="who-card">
+          <p class="who-card__label">Adjacent</p>
+          <h3>High-ticket B2B</h3>
+          <p>Long cycles, real money, and a handoff where context usually dies.</p>
+        </article>
+        <article class="who-card">
+          <p class="who-card__label">Fit</p>
+          <h3>5+ reps</h3>
+          <p>Enough volume to feel the admin drag. Small enough to onboard in weeks.</p>
+        </article>
+      </div>
+
+      <p class="small mt-2" data-reveal>
+        We are starting with a small pilot cohort in Nigeria. If you are not a fit, we will tell you.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--paper-2">
+    <div class="shell brain-grid">
+      <div data-reveal>
+        <Eyebrow>The wedge</Eyebrow>
+        <h2>Start with the deal. <em>Not the whole company.</em></h2>
+        <p class="lede mt-1">
+          Global AI CRMs are racing to build a company brain. We think trust is won at the deal
+          level first: one conversation, one evidence graph, one approval trail.
+        </p>
+        <p class="body mt-1">
+          That is the Deal Brain. It is narrow on purpose. It is how we earn the right to
+          remember more.
+        </p>
+        <blockquote class="brain-quote">
+          “Context is the moat. Trust is how you earn it.”
+        </blockquote>
+      </div>
+
+      <div class="brain-stack" data-reveal aria-label="Klozdesk memory roadmap">
+        <div class="brain-layer brain-layer--active">
+          <span class="brain-layer__label">Deal Brain</span>
+          <span class="brain-layer__note">One deal. Every source. Every approval.</span>
+        </div>
+        <div class="brain-layer brain-layer--muted">
+          <span class="brain-layer__label">Account memory</span>
+          <span class="brain-layer__note">The relationship around the deal.</span>
+        </div>
+        <div class="brain-layer brain-layer--muted">
+          <span class="brain-layer__label">Company memory</span>
+          <span class="brain-layer__note">The business, when the trust is earned.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTA />
+</BaseLayout>

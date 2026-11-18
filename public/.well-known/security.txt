@@ -1,0 +1,4 @@
+Contact: mailto:hello@klozdesk.com
+Expires: 2027-11-18T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://klozdesk.com/.well-known/security.txt

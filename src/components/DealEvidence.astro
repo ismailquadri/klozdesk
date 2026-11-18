@@ -1,0 +1,54 @@
+---
+import SourceChip from './SourceChip.astro';
+import DiffRow from './DiffRow.astro';
+---
+
+<div class="deal-card">
+  <div class="deal-card__bar">
+    <div>
+      <p class="deal-card__title">Deal room</p>
+      <p class="deal-card__meta">Orbit Solar · 40kW commercial</p>
+    </div>
+    <SourceChip label="Review" tone="clay" />
+  </div>
+
+  <div class="deal-card__body">
+    <div class="source-block">
+      <div class="source-block__head">
+        <span class="waveform" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <div>
+          <p class="source-block__title">Voice note · Site visit</p>
+          <p class="source-block__meta">Today, 14:32 · 1m 48s</p>
+        </div>
+        <SourceChip label="Source 01" tone="violet" />
+      </div>
+      <p class="source-block__quote">
+        “They want the 40kW system, but the MD wants the financing split over 18 months.”
+      </p>
+    </div>
+
+    <div class="diff-list">
+      <DiffRow label="Stage" from="Qualified" to="Proposal" source="Source 01" />
+      <DiffRow label="Amount" from="—" to="NGN 14.5m" tone="clay" source="Confirm" />
+      <DiffRow label="Next step" from="—" to="Send financing options" tone="sage" source="Source 01" />
+    </div>
+
+    <div class="deal-card__foot">
+      <p class="small">3 changes proposed · 1 needs confirmation</p>
+      <a href="/product" class="btn btn--ghost btn--sm">
+        Review changes <span class="btn__arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="receipt-float" aria-hidden="true">
+    <div class="receipt-float__head">
+      <span class="check">✓</span>
+      <span>Approved by Ada</span>
+    </div>
+    <p class="receipt-float__meta">Email queued · 14:36</p>
+  </div>
+</div>

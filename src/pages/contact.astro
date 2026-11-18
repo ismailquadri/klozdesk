@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Tell us about your sales team, your sales cycle, and where the deal record breaks. Apply for the Klozdesk design-partner pilot."
+>
+  <section class="page-hero">
+    <div class="shell">
+      <Eyebrow>Contact</Eyebrow>
+      <h1>Tell us about the deal <em>that keeps slipping.</em></h1>
+      <p class="lede">
+        We are onboarding a small pilot cohort of Nigerian solar and EPC sales teams. Tell us
+        about your team, your sales cycle, and where the record breaks.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell contact-grid">
+      <div data-reveal>
+        <Eyebrow>What to include</Eyebrow>
+        <h2>A short note is <em>enough.</em></h2>
+        <ul class="check-list">
+          <li>Team size and number of customer-facing reps.</li>
+          <li>Average deal size and typical sales cycle.</li>
+          <li>Where the conversation happens: voice notes, WhatsApp, email, site visits.</li>
+          <li>The CRM you use today—or the spreadsheet doing the job.</li>
+          <li>The handoff that hurts most: missed follow-up, stale stage, lost context.</li>
+        </ul>
+
+        <div class="callout mt-2">
+          We are a small team. If we are not a fit, we will say so—and point you somewhere better
+          if we can.
+        </div>
+      </div>
+
+      <div data-reveal>
+        <div class="email-card">
+          <Eyebrow tone="paper">Start here</Eyebrow>
+          <h2>One email. <em>No form maze.</em></h2>
+          <a class="email" href={`mailto:${site.email}?subject=Klozdesk%20pilot%20inquiry`}>
+            {site.email}
+          </a>
+          <br />
+          <button class="copy-button" type="button" data-copy={site.email}>
+            Copy email
+          </button>
+          <p class="small">
+            We aim to reply within two business days. If you prefer, include a phone number and a
+            good time to talk.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper-2">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>What happens next</Eyebrow>
+          <h2>Three steps. <em>No pressure.</em></h2>
+        </div>
+        <p class="lede">
+          We would rather disqualify a bad fit early than sell a pilot that cannot work.
+        </p>
+      </div>
+
+      <div class="pilot-grid" data-reveal>
+        <article class="pilot-card">
+          <span class="pilot-card__num">01</span>
+          <h3>A 20-minute conversation</h3>
+          <p>We ask about the deal, the team, and the record. You ask us anything.</p>
+        </article>
+        <article class="pilot-card">
+          <span class="pilot-card__num">02</span>
+          <h3>A fit check</h3>
+          <p>We confirm whether the workflow, channels, and timing are a real match.</p>
+        </article>
+        <article class="pilot-card">
+          <span class="pilot-card__num">03</span>
+          <h3>A written pilot scope</h3>
+          <p>One team, one workflow, six weeks, a fixed fee, and a clear exit.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const copyButton = document.querySelector('[data-copy]');
+
+  copyButton?.addEventListener('click', async () => {
+    const email = copyButton.getAttribute('data-copy') ?? '';
+    const original = copyButton.textContent ?? 'Copy email';
+
+    try {
+      await navigator.clipboard.writeText(email);
+      copyButton.textContent = 'Copied';
+      window.setTimeout(() => {
+        copyButton.textContent = original;
+      }, 1800);
+    } catch {
+      window.location.href = `mailto:${email}`;
+    }
+  });
+</script>

@@ -1,0 +1,12 @@
+---
+interface Props {
+  tone?: 'violet' | 'paper' | 'muted';
+}
+
+const { tone = 'violet' } = Astro.props;
+---
+
+<p class:list={['eyebrow', `eyebrow--${tone}`]}>
+  <span class="eyebrow__dot" aria-hidden="true"></span>
+  <span class="eyebrow__text"><slot /></span>
+</p>

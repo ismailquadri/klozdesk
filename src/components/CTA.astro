@@ -1,0 +1,36 @@
+---
+import Button from './Button.astro';
+import Eyebrow from './Eyebrow.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  text?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+
+const {
+  title = 'Bring one team. We’ll bring the evidence.',
+  text = 'We are onboarding a small cohort of Nigerian solar and EPC sales teams for a six-week pilot.',
+  primaryLabel = 'Apply for the pilot',
+  primaryHref = '/contact',
+  secondaryLabel = site.email,
+  secondaryHref = `mailto:${site.email}`,
+} = Astro.props;
+---
+
+<section class="cta section">
+  <div class="shell cta__inner" data-reveal>
+    <Eyebrow tone="paper">Pilot cohort</Eyebrow>
+    <h2>{title}</h2>
+    <p class="lede">{text}</p>
+    <div class="cta__actions">
+      <Button href={primaryHref} variant="light">{primaryLabel}</Button>
+      <a class="cta__mail" href={secondaryHref}>{secondaryLabel}</a>
+    </div>
+    <p class="cta__note">No fake badges. No autonomous outreach. No six-month implementation.</p>
+  </div>
+</section>

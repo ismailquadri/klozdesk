@@ -1,0 +1,12 @@
+---
+interface Props {
+  label: string;
+  tone?: 'violet' | 'clay' | 'sage' | 'muted';
+}
+
+const { label, tone = 'violet' } = Astro.props;
+---
+
+<span class:list={['chip', `chip--${tone}`]}>
+  <span class="chip__dot" aria-hidden="true"></span>{label}
+</span>

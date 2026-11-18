@@ -1,0 +1,23 @@
+---
+import SourceChip from './SourceChip.astro';
+
+interface Props {
+  label: string;
+  from: string;
+  to: string;
+  tone?: 'violet' | 'clay' | 'sage';
+  source?: string;
+}
+
+const { label, from, to, tone = 'violet', source } = Astro.props;
+---
+
+<div class="diff">
+  <span class="diff__label">{label}</span>
+  <span class="diff__change">
+    <span class="diff__from">{from}</span>
+    <span class="diff__arrow" aria-hidden="true">→</span>
+    <span class:list={['diff__to', `diff__to--${tone}`]}>{to}</span>
+  </span>
+  {source && <SourceChip label={source} tone={tone} />}
+</div>

@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Privacy"
+  description="How Klozdesk handles information sent through this website. This notice covers the website, not the pilot product."
+>
+  <section class="page-hero">
+    <div class="shell">
+      <Eyebrow>Privacy</Eyebrow>
+      <h1>Privacy, <em>in plain language.</em></h1>
+      <p class="lede">
+        This notice covers the Klozdesk website. It does not cover the pilot product. Pilot
+        customers receive a separate data processing agreement before any customer data enters
+        the system.
+      </p>
+      <p class="small mt-1">Last updated: 18 November 2026</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="prose">
+        <h2>Who we are</h2>
+        <p>
+          Klozdesk is a product of Sparkr Digitals, based in Nigeria. For privacy questions about
+          this website, contact <a href={`mailto:${site.email}`}>{site.email}</a>.
+        </p>
+
+        <h2>What this notice covers</h2>
+        <p>
+          This notice covers <strong>klozdesk.com</strong> and the information you choose to send
+          us through it. It does not cover the Klozdesk pilot product, customer deal data, or any
+          service governed by a separate agreement.
+        </p>
+
+        <h2>What we collect</h2>
+        <ul>
+          <li>
+            <strong>Information you email us.</strong> Your name, email address, company, and
+            whatever you choose to include in your message.
+          </li>
+          <li>
+            <strong>Technical logs.</strong> Our hosting provider may record basic request data
+            such as IP address, browser type, and request time to keep the site secure and
+            reliable.
+          </li>
+          <li>
+            <strong>No advertising trackers.</strong> We do not run third-party advertising
+            pixels or sell contact data.
+          </li>
+        </ul>
+
+        <h2>How we use it</h2>
+        <ul>
+          <li>To reply to your inquiry and discuss a possible pilot.</li>
+          <li>To operate, secure, and troubleshoot the website.</li>
+          <li>To meet legal, accounting, or regulatory obligations that apply to us.</li>
+        </ul>
+
+        <h2>Sharing</h2>
+        <p>
+          We share information only with service providers that help us operate the website or
+          respond to you—for example, our hosting provider—and with professional advisers where
+          necessary. We do not sell personal information.
+        </p>
+
+        <h2>Retention</h2>
+        <p>
+          We keep inquiry emails for up to 12 months unless a business relationship requires a
+          longer period. Technical logs are kept according to our hosting provider’s retention
+          settings. When information is no longer needed, we delete it or anonymize it.
+        </p>
+
+        <h2>International transfers</h2>
+        <p>
+          Our website hosting provider may process technical logs outside Nigeria. Before pilot
+          customer data enters the product, we will confirm the provider terms, transfer
+          safeguards, and subprocessor list in the pilot agreement.
+        </p>
+
+        <h2>Your rights</h2>
+        <p>
+          Depending on applicable law, you may ask to access, correct, or delete personal
+          information we hold about you, or object to certain processing. Email
+          <a href={`mailto:${site.email}`}>{site.email}</a> and we will respond within a
+          reasonable period.
+        </p>
+
+        <h2>Cookies</h2>
+        <p>
+          This website does not set advertising cookies. Our hosting provider may use strictly
+          necessary technical storage to serve the site securely. If we add analytics later, we
+          will update this notice before enabling it.
+        </p>
+
+        <h2>Changes</h2>
+        <p>
+          We may update this notice as the website or the company changes. The date at the top of
+          this page shows the latest version.
+        </p>
+
+        <div class="callout">
+          <strong>This is a website notice, not the pilot DPA.</strong> If you are joining the
+          pilot, the data processing agreement—not this page—governs customer deal data, consent,
+          retention, deletion, and subprocessors.
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

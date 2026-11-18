@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import CTA from '../components/CTA.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Klozdesk is building the Deal Brain for Nigerian high-ticket sales: a source-linked, human-approved record of what actually happened in the deal."
+>
+  <section class="page-hero">
+    <div class="shell">
+      <Eyebrow>About</Eyebrow>
+      <h1>We are building the record <em>that tells the truth.</em></h1>
+      <p class="lede">
+        Klozdesk started with a simple observation: in high-ticket sales, the most important
+        context never makes it into the CRM.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell two-col">
+      <div data-reveal>
+        <Eyebrow>Why we exist</Eyebrow>
+        <h2>The deal lives <em>in the field.</em></h2>
+        <p class="body mt-1">
+          A rep leaves a site visit with the real context in a voice note: the budget, the
+          blocker, the decision-maker, the next step. A quote goes out by email. A WhatsApp thread
+          carries the objection. The CRM gets a summary hours later—written by someone who was not
+          there.
+        </p>
+        <p class="body mt-1">
+          That gap is not a discipline problem. It is a design problem. The tools ask salespeople
+          to stop selling and become data-entry clerks. The record suffers, and so does the next
+          person who has to act on it.
+        </p>
+      </div>
+      <div data-reveal>
+        <Eyebrow>Why now</Eyebrow>
+        <h2>Models are good enough. <em>Trust is the bottleneck.</em></h2>
+        <p class="body mt-1">
+          Language models can finally extract structure from messy conversation. The hard part is
+          no longer intelligence. It is trust: proving what happened, showing the source, and
+          keeping a human accountable for the action.
+        </p>
+        <p class="body mt-1">
+          We think the companies that win this category will not be the ones with the most agents.
+          They will be the ones with the most trustworthy memory of the deal.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper-2">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>What we believe</Eyebrow>
+          <h2>Four principles. <em>No exceptions.</em></h2>
+        </div>
+        <p class="lede">
+          These are product constraints, not poster slogans. If a feature violates one, it does
+          not ship.
+        </p>
+      </div>
+
+      <div class="not-grid" data-reveal>
+        <article class="not-card">
+          <h3>Evidence over eloquence.</h3>
+          <p>A confident answer is worthless if it cannot show its source. Cite, abstain, or ask a human.</p>
+        </article>
+        <article class="not-card">
+          <h3>Human approval over autonomy theater.</h3>
+          <p>The rep stays accountable. The software earns the right to act—one approved action at a time.</p>
+        </article>
+        <article class="not-card">
+          <h3>One workflow before ten features.</h3>
+          <p>Depth beats breadth at this stage. We would rather prove one loop than demo ten.</p>
+        </article>
+        <article class="not-card">
+          <h3>Local reality over global templates.</h3>
+          <p>Voice notes, WhatsApp, Pidgin, unreliable networks, and naira pricing are the starting point—not an edge case.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        <div>
+          <Eyebrow>Where we are</Eyebrow>
+          <h2>Pre-launch. <em>And honest about it.</em></h2>
+        </div>
+        <p class="lede">
+          We are not going to borrow someone else’s traction. Here is the actual state of the
+          company.
+        </p>
+      </div>
+
+      <div class="not-grid" data-reveal>
+        <article class="not-card">
+          <h3>Prototype</h3>
+          <p>Built and under review. It is a starting point, not a production system.</p>
+        </article>
+        <article class="not-card">
+          <h3>Production foundation</h3>
+          <p>In progress: tenancy, consent, evidence, approval, and audit before live customer data.</p>
+        </article>
+        <article class="not-card">
+          <h3>Pilot</h3>
+          <p>Opening a small cohort of Nigerian solar and EPC sales teams.</p>
+        </article>
+        <article class="not-card">
+          <h3>Traction</h3>
+          <p>None we can claim yet. We will publish the evidence when we have it—including what did not work.</p>
+        </article>
+      </div>
+
+      <div class="founder-note" data-reveal>
+        <p>
+          “I started Klozdesk because I watched good sales teams lose deals to bad paperwork. The
+          answer is not another dashboard. It is a record that tells the truth.”
+        </p>
+        <footer>Quadri Ismail · Founder, Klozdesk</footer>
+      </div>
+
+      <div class="mt-2" data-reveal>
+        <Button href="/contact" variant="primary">Talk to us about the pilot</Button>
+      </div>
+    </div>
+  </section>
+
+  <CTA />
+</BaseLayout>
