@@ -26,6 +26,10 @@ def resolve_file(req_path):
     unquoted = urllib.parse.unquote(req_path)
     parts = unquoted.split('?', 1)
     path = parts[0].replace('\\(', '(').replace('\\)', ')').lstrip('/')
+    if path == "api":
+        path = "api-docs"
+    elif path.startswith("api/"):
+        path = "api-docs/" + path[4:]
     query = parts[1] if len(parts) > 1 else ""
 
     target = os.path.join(DIRECTORY, path)

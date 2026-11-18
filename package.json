@@ -1,9 +1,8 @@
 {
-  "name": "dreamteam-clone",
+  "name": "klosdesk",
   "version": "1.0.0",
-  "description": "Full-fidelity local clone of dreamteam.ai",
+  "description": "Klosdesk - AI Sales Teammate for Nigerian and African Businesses",
   "scripts": {
-    "dev": "python3 serve.py 3001",
-    "start": "python3 serve.py 3001"
+    "dev": "python3 serve.py 3001"
   }
 }

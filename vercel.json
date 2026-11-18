@@ -1,0 +1,19 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api", "destination": "/api-docs/index.html" },
+    { "source": "/api/", "destination": "/api-docs/index.html" },
+    { "source": "/api/(.*)", "destination": "/api-docs/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}
