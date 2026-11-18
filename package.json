@@ -1,7 +1,7 @@
 {
-  "name": "klosdesk",
+  "name": "klozdesk",
   "version": "1.0.0",
-  "description": "Klosdesk - AI Sales Teammate for Nigerian and African Businesses",
+  "description": "Klozdesk - AI Sales Teammate for Nigerian and African Businesses",
   "scripts": {
     "dev": "python3 serve.py 3001"
   }
