@@ -1,0 +1,1784 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Records - Dreamteam CRM API</title>
+  <meta name="description" content="Records are the core objects in Dreamteam CRM. Contacts, companies, deals, meetings, notes, and tasks are all records, as is every custom object you define, and these endpoints work the same way for each." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html">Authentication</a>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html">Schema</a>
+          </li>
+          <li>
+            <a href="/api/records.html" class="active">Records</a>
+            <ul class="nav-sublist">
+              <li><a href="#the-record-model">The record model</a></li>
+              <li><a href="#list-records">List records</a></li>
+              <li><a href="#create-a-record">Create a record</a></li>
+              <li><a href="#retrieve-a-record">Retrieve a record</a></li>
+              <li><a href="#update-a-record">Update a record</a></li>
+              <li><a href="#delete-a-record">Delete a record</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html">Users</a>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html">Meetings & transcripts</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content section" data-pagefind-body>
+        
+<script>
+  // Test configs are keyed by endpoint id, then by object type (contact /
+  // company / deal). The Test Request button reads the currently-selected
+  // object tab from the section and picks the matching config. Keeping the
+  // three variants close together makes it easy to swap or add object types.
+  window.TEST_CONFIGS = {
+    'list-records': {
+      contact: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'contact', required: true, type: 'string' }],
+        query: [
+          { name: 'page', value: '1', type: 'integer' },
+          { name: 'page_size', value: '20', type: 'integer' },
+          { name: 'associations', value: 'company,note', type: 'string[]', placeholder: 'company,note (comma-separated)' }
+        ]
+      },
+      company: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'company', required: true, type: 'string' }],
+        query: [
+          { name: 'page', value: '1', type: 'integer' },
+          { name: 'page_size', value: '20', type: 'integer' },
+          { name: 'associations', value: 'contact,deal', type: 'string[]', placeholder: 'contact,deal (comma-separated)' }
+        ]
+      },
+      deal: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'deal', required: true, type: 'string' }],
+        query: [
+          { name: 'page', value: '1', type: 'integer' },
+          { name: 'page_size', value: '20', type: 'integer' },
+          { name: 'associations', value: 'company,contact', type: 'string[]', placeholder: 'company,contact (comma-separated)' }
+        ]
+      }
+    },
+    'create-a-record': {
+      contact: {
+        method: 'POST',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'contact', required: true, type: 'string' }],
+        body: JSON.stringify({
+          properties: {
+            first_name: 'Ada',
+            last_name: 'Chen',
+            email: 'ada@example.com'
+          }
+        }, null, 2)
+      },
+      company: {
+        method: 'POST',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'company', required: true, type: 'string' }],
+        body: JSON.stringify({
+          properties: {
+            name: 'Analytical Engines Ltd',
+            domain: 'analytical-engines.com',
+            industry: 'Hardware'
+          }
+        }, null, 2)
+      },
+      deal: {
+        method: 'POST',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'deal', required: true, type: 'string' }],
+        body: JSON.stringify({
+          properties: {
+            name: 'Analytical Engines - Q3',
+            amount: 100000,
+            expected_close_date: '2026-09-19',
+            company_ids: [1011597],
+            contact_ids: [1015634],
+            stage_id: 1000003,
+            pipeline_id: 1000000
+          }
+        }, null, 2)
+      },
+      note: {
+        method: 'POST',
+        path: '/api/v1/objects/{object}/records',
+        variables: [{ name: 'object', value: 'note', required: true, type: 'string' }],
+        body: JSON.stringify({
+          properties: {
+            content: 'Met Ada at the Cambridge conference; wants a follow-up demo.',
+            contact_ids: [1015634]
+          }
+        }, null, 2)
+      }
+    },
+    'retrieve-a-record': {
+      contact: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'contact', required: true, type: 'string' },
+          { name: 'id', value: '1015634', required: true, type: 'integer' }
+        ],
+        query: [
+          { name: 'associations', value: 'company,note', type: 'string[]', placeholder: 'company,note' }
+        ],
+        variants: {
+          // Field stays present but empty: an empty value is skipped when the
+          // URL is built, so no ?associations= is emitted - matching the curl.
+          plain: { query: [{ name: 'associations', value: '', type: 'string[]', placeholder: 'company,note' }] },
+          'with-associations': { query: [{ name: 'associations', value: 'company,note', type: 'string[]', placeholder: 'company,note' }] }
+        }
+      },
+      company: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'company', required: true, type: 'string' },
+          { name: 'id', value: '1011597', required: true, type: 'integer' }
+        ],
+        query: [
+          { name: 'associations', value: 'contact,deal', type: 'string[]', placeholder: 'contact,deal' }
+        ],
+        variants: {
+          // Field stays present but empty: an empty value is skipped when the
+          // URL is built, so no ?associations= is emitted - matching the curl.
+          plain: { query: [{ name: 'associations', value: '', type: 'string[]', placeholder: 'contact,deal' }] },
+          'with-associations': { query: [{ name: 'associations', value: 'contact,deal', type: 'string[]', placeholder: 'contact,deal' }] }
+        }
+      },
+      deal: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'deal', required: true, type: 'string' },
+          { name: 'id', value: '1011624', required: true, type: 'integer' }
+        ],
+        query: [
+          { name: 'associations', value: 'company,contact', type: 'string[]', placeholder: 'company,contact' }
+        ],
+        variants: {
+          // Field stays present but empty: an empty value is skipped when the
+          // URL is built, so no ?associations= is emitted - matching the curl.
+          plain: { query: [{ name: 'associations', value: '', type: 'string[]', placeholder: 'company,contact' }] },
+          'with-associations': { query: [{ name: 'associations', value: 'company,contact', type: 'string[]', placeholder: 'company,contact' }] }
+        }
+      },
+      note: {
+        method: 'GET',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'note', required: true, type: 'string' },
+          { name: 'id', value: '1021044', required: true, type: 'integer' }
+        ],
+        query: [
+          { name: 'associations', value: 'contact', type: 'string[]', placeholder: 'contact' }
+        ],
+        variants: {
+          plain: { query: [{ name: 'associations', value: '', type: 'string[]', placeholder: 'contact' }] },
+          'with-associations': { query: [{ name: 'associations', value: 'contact', type: 'string[]', placeholder: 'contact' }] }
+        }
+      }
+    },
+    'update-a-record': {
+      contact: {
+        method: 'PATCH',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'contact', required: true, type: 'string' },
+          { name: 'id', value: '1015634', required: true, type: 'integer' }
+        ],
+        contentType: 'application/merge-patch+json',
+        body: JSON.stringify({
+          properties: { email: 'ada@example.com' }
+        }, null, 2)
+      },
+      company: {
+        method: 'PATCH',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'company', required: true, type: 'string' },
+          { name: 'id', value: '1011597', required: true, type: 'integer' }
+        ],
+        contentType: 'application/merge-patch+json',
+        body: JSON.stringify({
+          properties: { industry: 'Software' }
+        }, null, 2)
+      },
+      deal: {
+        method: 'PATCH',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'deal', required: true, type: 'string' },
+          { name: 'id', value: '1011624', required: true, type: 'integer' }
+        ],
+        contentType: 'application/merge-patch+json',
+        body: JSON.stringify({
+          properties: { stage_id: 1000004 }
+        }, null, 2)
+      },
+      note: {
+        method: 'PATCH',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'note', required: true, type: 'string' },
+          { name: 'id', value: '1021044', required: true, type: 'integer' }
+        ],
+        contentType: 'application/merge-patch+json',
+        body: JSON.stringify({
+          properties: { content: 'Met Ada at the Cambridge conference; demo booked for Nov 12.' }
+        }, null, 2)
+      }
+    },
+    'delete-a-record': {
+      contact: {
+        method: 'DELETE',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'contact', required: true, type: 'string' },
+          { name: 'id', value: '1015634', required: true, type: 'integer' }
+        ]
+      },
+      company: {
+        method: 'DELETE',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'company', required: true, type: 'string' },
+          { name: 'id', value: '1011597', required: true, type: 'integer' }
+        ]
+      },
+      deal: {
+        method: 'DELETE',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'deal', required: true, type: 'string' },
+          { name: 'id', value: '1011624', required: true, type: 'integer' }
+        ]
+      },
+      note: {
+        method: 'DELETE',
+        path: '/api/v1/objects/{object}/records/{id}',
+        variables: [
+          { name: 'object', value: 'note', required: true, type: 'string' },
+          { name: 'id', value: '1021044', required: true, type: 'integer' }
+        ]
+      }
+    }
+  };
+</script>
+
+
+        <!-- Section intro -->
+        <p class="eyebrow">Resources</p>
+        <h1>Records</h1>
+        <p class="lede">Records are the core objects in Dreamteam CRM. Contacts, companies, deals, meetings, notes, and tasks are all records, as is every custom object you define. These endpoints work the same way for each: you change the object type in the path, and the request and response shapes stay the same. The examples below use contacts, companies, and deals.</p>
+
+        <div class="callout">
+          <p class="callout-title">Some object types add their own rules or endpoints</p>
+          <p>The routes here cover every object type, and you create, edit, and delete each one the same way. A few types layer extra behaviour on top: tasks, for example, must be linked to a record and are handed over through a dedicated reassignment endpoint - see <a href="/tasks">Tasks</a>. Records of your own <strong>custom objects</strong> use these same routes with the custom object's slug in the path - see <a href="/api/custom-objects.html">Custom objects</a>.</p>
+        </div>
+
+        <!-- ============ Model ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="the-record-model" style="margin-top:0;">The record model</h2>
+              <p>A record has a stable numeric <code>id</code>, an <code>object</code> type it belongs to (like <code>contact</code> or <code>deal</code>), and a bag of <code>properties</code> whose shape depends on the object type. Optionally, a record can carry an <code>associations</code> block that embeds linked records grouped by type.</p>
+              <p><strong>AI-generated fields live inside <code>properties</code></strong>, next to the schema fields. Text-heavy ones are prefixed <code>ai_</code> (e.g. <code>ai_about</code>, <code>ai_exec_summary</code>) and come back as a <strong>JSON string</strong> encoding a <em>card</em> - <code>{ "title", "icon_category", "content": [...], "metadata" }</code> - which some fields return as an array. Scalar signals such as <code>engagement</code>, <code>confidence</code>, <code>risk</code>, and <code>icp</code> are plain values. All are <strong>read-only</strong> and populated <strong>asynchronously</strong>, so a freshly-created record returns them empty or absent.</p>
+
+              <h3>Properties</h3>
+              <table>
+                <thead>
+                  <tr><th>Attribute</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Numeric identifier for the record. Stable across the record's lifetime.</td></tr>
+                  <tr><td><code>type</code></td><td>The object type - <code>contact</code>, <code>company</code>, <code>deal</code>, <code>meeting</code>, <code>note</code>, or <code>task</code>, plus any custom object type you define.</td></tr>
+                  <tr><td><code>properties</code></td><td>Object of key-value pairs. Keys are property names from the object's schema; values match the property's data type.</td></tr>
+                  <tr><td><code>ai_*</code> <span class="muted">read-only</span></td><td>AI-generated fields, nested inside <code>properties</code>. Text fields (prefixed <code>ai_</code>) are JSON-string cards; scalar signals (e.g. <code>engagement</code>, <code>icp</code>, <code>confidence</code>) are plain values. Populated asynchronously - empty or absent on a new record.</td></tr>
+                  <tr><td><code>associations</code></td><td>Optional. Present when the request opts into embedding. Grouped by object type, with a <code>records</code> array and per-type <code>metadata</code>.</td></tr>
+                  <tr><td><code>created_at</code></td><td>ISO 8601 timestamp when the record was created.</td></tr>
+                  <tr><td><code>updated_at</code></td><td>ISO 8601 timestamp of the last property change.</td></tr>
+                  <tr><td><code>created_by</code></td><td>User id of the record's creator.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="code-col">
+              <div class="code-panel">
+                <div class="code-panel-head">
+                  <div class="code-panel-tabs">
+                    <button class="code-panel-tab active" data-tab="a">The record object</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-tab="a"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"ai_exec_summary"</span>: <span class="tok-s">"[{\"title\":\"Executive Summary\",\"icon_category\":\"executive_summary\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"},{\"icon_category\":\"target\",\"value\":\"Next best step: a discovery call to confirm needs and timeline.\"}]}]"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd, reachable at ada@example.com.\"}],\"metadata\":{\"tags\":[{\"icon_category\":\"map_pin\",\"value\":\"Cambridge, UK\"}],\"links\":[]}}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-29T10:23:35.757096Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ List records ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="list-records" style="margin-top:0;" data-pagefind-weight="7">List records</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/records</span>
+              </div>
+              <p>Lists the <strong>contacts</strong>, <strong>companies</strong>, <strong>deals</strong>, <strong>meetings</strong> or <strong>notes</strong> you have access to, a page at a time. Pass the object type in the URL path. Pass <code>associations</code> query parameters (repeatable) to embed linked records under each returned record's <code>associations</code> block. Omit them to get properties only.</p>
+
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type - one of <code>contact</code>, <code>company</code>, <code>deal</code>, <code>meeting</code>, <code>note</code>, <code>task</code>, or a custom object.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Query parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>page</code> <span class="muted">integer</span></td><td>Page number, starts at <code>1</code>. Defaults to <code>1</code>.</td></tr>
+                  <tr><td><code>page_size</code> <span class="muted">integer</span></td><td>Records per page, up to <code>100</code>. Defaults to <code>20</code>.</td></tr>
+                  <tr><td><code>associations</code> <span class="muted">string[]</span></td><td>Object types to embed under each record. Repeatable - e.g. <code>?associations=company&amp;associations=note</code>. Omit to skip embedding.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>A paginated list of records under <code>results</code>, plus a <code>metadata</code> object with <code>page</code>, <code>page_size</code>, <code>total_elements</code>, <code>total_pages</code>, <code>has_next</code>, and <code>has_previous</code>.</p>
+            </div>
+
+            <div class="code-col">
+              <div class="code-object-tabs" aria-label="Object type: contact, company, or deal">
+                <span class="code-object-tabs-label">Object</span>
+                <button class="code-object-tab active" data-object="contact">Contact</button>
+                <button class="code-object-tab" data-object="company">Company</button>
+                <button class="code-object-tab" data-object="deal">Deal</button>
+              </div>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-object="contact"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records?page=1&amp;page_size=20&amp;associations=company&amp;associations=note'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="company"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records?page=1&amp;page_size=20&amp;associations=contact&amp;associations=deal'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="deal"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records?page=1&amp;page_size=20&amp;associations=company&amp;associations=contact'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="list-records">Test Request</button>
+                </div>
+              </div>
+                            <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                <div class="response-variant-bar" data-status-var="200"><button class="response-variant-tab" data-variant="list-plain">Without associations</button><button class="response-variant-tab active" data-variant="list-with-associations">With associations</button></div>
+                <div class="code-body" data-status="200" data-variant="list-with-associations" data-view="example" data-object="contact"><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+        <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+        <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+        <span class="tok-p">"source"</span>: <span class="tok-s">"Email"</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>,
+        <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+        <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"}]}"</span>
+      },
+      <span class="tok-p">"associations"</span>: {
+        <span class="tok-p">"company"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        },
+        <span class="tok-p">"note"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1005567</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_notes_assoc"</span>
+            },
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1005568</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_notes_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        }
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-29T10:23:35.757096Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="list-with-associations" data-view="example" data-object="company"><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+        <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+        <span class="tok-p">"industry"</span>: <span class="tok-s">"Hardware"</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"icp"</span>: <span class="tok-s">"Strong Fit"</span>,
+        <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Analytical Engines Ltd\",\"icon_category\":\"company_overview\",\"content\":[{\"icon_category\":\"building\",\"value\":\"Hardware company; mid-market; UK-based.\"}]}"</span>
+      },
+      <span class="tok-p">"associations"</span>: {
+        <span class="tok-p">"contact"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+            },
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1015635</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        },
+        <span class="tok-p">"deal"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_deal_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        }
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T11:00:00Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="list-with-associations" data-view="example" data-object="deal"><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+        <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+        <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000003</span>,
+        <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"confidence"</span>: <span class="tok-s">"Medium"</span>,
+        <span class="tok-p">"ai_deal_qualification"</span>: <span class="tok-s">"{\"qualification_framework\":{\"framework_type\":\"MEDDPICC\",\"overall_score\":42,\"components\":[{\"title\":\"Metrics\",\"status\":\"Identified\",\"score\":60},{\"title\":\"Economic Buyer\",\"status\":\"Unknown\",\"score\":0}]}}"</span>
+      },
+      <span class="tok-p">"associations"</span>: {
+        <span class="tok-p">"company"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_deal_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        },
+        <span class="tok-p">"contact"</span>: {
+          <span class="tok-p">"records"</span>: [
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_deal_assoc"</span>
+            },
+            {
+              <span class="tok-p">"id"</span>: <span class="tok-n">1015635</span>,
+              <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_deal_assoc"</span>
+            }
+          ],
+          <span class="tok-p">"metadata"</span>: {
+            <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+            <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+          }
+        }
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T13:00:55.857056Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="list-plain" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+        <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+        <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+        <span class="tok-p">"source"</span>: <span class="tok-s">"Email"</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>,
+        <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+        <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"}]}"</span>
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-29T10:23:35.757096Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="list-plain" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+        <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+        <span class="tok-p">"industry"</span>: <span class="tok-s">"Hardware"</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"icp"</span>: <span class="tok-s">"Strong Fit"</span>,
+        <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Analytical Engines Ltd\",\"icon_category\":\"company_overview\",\"content\":[{\"icon_category\":\"building\",\"value\":\"Hardware company; mid-market; UK-based.\"}]}"</span>
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T11:00:00Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="list-plain" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+      <span class="tok-p">"properties"</span>: {
+        <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+        <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+        <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000003</span>,
+        <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+        <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+        <span class="tok-p">"confidence"</span>: <span class="tok-s">"Medium"</span>,
+        <span class="tok-p">"ai_deal_qualification"</span>: <span class="tok-s">"{\"qualification_framework\":{\"framework_type\":\"MEDDPICC\",\"overall_score\":42,\"components\":[{\"title\":\"Metrics\",\"status\":\"Identified\",\"score\":60},{\"title\":\"Economic Buyer\",\"status\":\"Unknown\",\"score\":0}]}}"</span>
+      },
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T13:00:55.857056Z"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"properties"</span>: <span class="tok-s">"object"</span>,
+      <span class="tok-p">"associations"</span>: <span class="tok-s">"object"</span>,
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"updated_at"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"created_by"</span>: <span class="tok-s">"integer"</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-s">"boolean"</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-s">"boolean"</span>
+  }
+}</code></pre></div>
+                <div class="response-caption" data-status="200">Paginated record list.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Create a record ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="create-a-record" style="margin-top:0;" data-pagefind-weight="7">Create a record</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-post">POST</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/records</span>
+              </div>
+              <p>Creates a single record - pass the object type in the URL path. You can create the standard CRM record types <strong>contact</strong>, <strong>company</strong>, <strong>deal</strong>, <strong>note</strong>, and <strong>task</strong>, plus records of any <strong>custom object type</strong>. A <code>note</code> needs only its <code>content</code> (optional) and can be created with or without a linked record. The request body's <code>properties</code> object must satisfy that type's schema for required fields; unknown property keys are rejected. Some types are read-only through this API - <code>recording</code> records, for instance, are ingested by call and meeting integrations and reject direct creation.</p>
+
+              <div class="callout">
+                <p class="callout-title">Associations at create time</p>
+                <p>Link the new record to existing records by setting the object's <strong>lookup fields inside <code>properties</code></strong> - there is no separate <code>associations</code> array. A lookup field is named <code>&lt;object&gt;_ids</code> and takes the target record id(s); a deal, for example, accepts <code>company_ids</code> and <code>contact_ids</code>. Call the Schema endpoint to see which lookup fields an object supports.</p>
+                <p><strong>Naming heads-up:</strong> the lookup field you write (e.g. <code>company_ids</code>) maps to an association whose full identifier surfaces elsewhere as <code>association_name</code> (e.g. <code>"company_deal_assoc"</code>). To read a record's linked records back, pass the <code>associations</code> query parameter on Find Records or Retrieve.</p>
+              </div>
+
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type to create the record under.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Request body</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>properties</code> <span class="muted">object · required</span></td><td>Object matching the target object's schema. Required fields must be present. To link related records, set the object's lookup fields here (e.g. <code>company_ids</code>, <code>contact_ids</code>).</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>The created record, including its assigned <code>id</code>, <code>created_at</code>, and <code>created_by</code>.</p>
+            </div>
+
+            <div class="code-col">
+              <div class="code-object-tabs" aria-label="Object type: contact, company, deal, or note">
+                <span class="code-object-tabs-label">Object</span>
+                <button class="code-object-tab active" data-object="contact">Contact</button>
+                <button class="code-object-tab" data-object="company">Company</button>
+                <button class="code-object-tab" data-object="deal">Deal</button>
+                <button class="code-object-tab" data-object="note">Note</button>
+              </div>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-object="contact"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records'</span> \
+  -X <span class="tok-s">POST</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "first_name": "Ada",
+      "last_name": "Chen",
+      "email": "ada@example.com"
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="company"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records'</span> \
+  -X <span class="tok-s">POST</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "name": "Analytical Engines Ltd",
+      "domain": "analytical-engines.com",
+      "industry": "Hardware"
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="deal"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records'</span> \
+  -X <span class="tok-s">POST</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "name": "Analytical Engines - Q3",
+      "amount": 100000,
+      "expected_close_date": "2026-09-19",
+      "company_ids": [1011597],
+      "contact_ids": [1015634],
+      "stage_id": 1000003,
+      "pipeline_id": 1000000
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="note"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records'</span> \
+  -X <span class="tok-s">POST</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "content": "Met Ada at the Cambridge conference; wants a follow-up demo.",
+      "contact_ids": [1015634]
+    }
+  }'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="create-a-record">Test Request</button>
+                </div>
+              </div>
+                            <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="201"><span class="dot dot-ok"></span>201 Created</button>
+                    <button class="response-status-tab" data-status="400"><span class="dot dot-warn"></span>400 Bad Request</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                <div class="response-variant-bar" data-status-var="400" hidden><button class="response-variant-tab active" data-variant="invalid-value">Invalid value</button><button class="response-variant-tab" data-variant="required-field-missing">Required field missing</button></div>
+                <div class="code-body" data-status="201" data-variant="default" data-view="example" data-object="contact"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="201" data-variant="default" data-view="example" data-object="company"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+    <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+    <span class="tok-p">"industry"</span>: <span class="tok-s">"Hardware"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="201" data-variant="default" data-view="example" data-object="deal"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+    <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+    <span class="tok-p">"expected_close_date"</span>: <span class="tok-s">"2026-09-19T00:00:00Z"</span>,
+    <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000003</span>,
+    <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-30T10:58:41.740762Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="201" data-variant="default" data-view="example" data-object="note"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1021044</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"note"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"content"</span>: <span class="tok-s">"Met Ada at the Cambridge conference; wants a follow-up demo."</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="201" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"properties"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"associations"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-s">"integer"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="invalid-value" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;email&#x27; must be unique."</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"DUPLICATE_VALUE"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"email"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Value &#x27;ada@example.com&#x27; already exists for this contact (conflicting record ID: 1012888)."</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/contact/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-07-02T08:48:05.199294005"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="invalid-value" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;domain&#x27; must be unique."</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"DUPLICATE_VALUE"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"domain"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Value &#x27;analytical-engines.com&#x27; already exists for this company (conflicting record ID: 1011590)."</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/company/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-07-02T08:48:05.199294005"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="invalid-value" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;stage_id&#x27; is invalid."</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"INVALID_FIELD"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"stage_id"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Stage 9999 does not belong to pipeline 1000000."</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/deal/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-07-02T08:48:05.199294005"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="required-field-missing" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;email&#x27; is required"</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"REQUIRED_FIELD_MISSING"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"email"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;email&#x27; is required"</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/contact/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-07-02T08:48:05.199294005"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="required-field-missing" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;name&#x27; is required"</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"REQUIRED_FIELD_MISSING"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"name"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;name&#x27; is required"</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/company/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-07-02T08:48:05.199294005"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-variant="required-field-missing" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"VALIDATION_FAILED"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;expected_close_date&#x27; is required"</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"REQUIRED_FIELD_MISSING"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"expected_close_date"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"Field &#x27;expected_close_date&#x27; is required"</span>
+    }
+  ],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/deal/records"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-08-11T09:26:41.025999781"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="400" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"string"</span>
+    }
+  ]
+}</code></pre></div>
+                <div class="response-caption" data-status="201">Record created</div>
+                <div class="response-caption" data-status="400" hidden>Validation error - see the <code>errors</code> array for specifics.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Retrieve a record ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="retrieve-a-record" style="margin-top:0;" data-pagefind-weight="7">Retrieve a record</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+              </div>
+              <p>Fetches a single <strong>contact</strong>, <strong>company</strong>, <strong>deal</strong>, <strong>meeting</strong>, or <strong>note</strong> by its id. By default the sample request embeds linked <code>company</code> and <code>contact</code> records - omit the <code>associations</code> query params to get a plain record with only its <code>properties</code>.</p>
+
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type of the record.</td></tr>
+                  <tr><td><code>id</code> <span class="muted">integer · required</span></td><td>Numeric identifier of the record.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Query parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>associations</code> <span class="muted">string[]</span></td><td>Object types to embed under <code>associations</code>. Repeatable. Omit to skip embedding.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>The record. If <code>associations</code> was requested, a matching <code>associations</code> block is embedded - grouped by object type, each with a <code>records</code> array and per-type <code>metadata</code> (<code>total</code>, <code>has_more</code>). Embedded associations return <strong>ids only</strong> - see <a href="/api/find-records.html#batch-fetch">Hydrate by IDs</a> for turning them into full records.</p>
+
+              <div class="callout">
+                <p class="callout-title">Paging associations past 100</p>
+                <p>Embedded associations are capped at <strong>100 per type</strong>. If <code>has_more: true</code>, paginate the rest with the dedicated endpoint:</p>
+                <p><code>GET /api/v1/objects/{object}/records/{id}/associations/{target_type}?page=1&amp;page_size=50</code></p>
+                <p class="muted">Read-only. Writing new association links is not available yet.</p>
+              </div>
+
+              <div class="callout">
+                <p class="callout-title">Fetching note content</p>
+                <p>Notes come back as <code>{id, association_name}</code> pairs. To get the actual note text, call Retrieve a Record with <code>object=note</code> and the note's id.</p>
+              </div>
+            </div>
+
+            <div class="code-col">
+              <div class="code-object-tabs" aria-label="Object type: contact, company, deal, or note">
+                <span class="code-object-tabs-label">Object</span>
+                <button class="code-object-tab" data-object="contact">Contact</button>
+                <button class="code-object-tab" data-object="company">Company</button>
+                <button class="code-object-tab active" data-object="deal">Deal</button>
+                <button class="code-object-tab" data-object="note">Note</button>
+              </div>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="request-variant-bar"><button class="request-variant-tab" data-req-variant="plain" data-sync-response="single-record">Without associations</button><button class="request-variant-tab active" data-req-variant="with-associations" data-sync-response="with-associations">With associations</button></div>
+                <div class="code-body" data-object="contact" data-req-variant="plain" hidden><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records/1015634'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="company" data-req-variant="plain" hidden><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records/1011597'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="deal" data-req-variant="plain" hidden><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records/1011624'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="contact" data-req-variant="with-associations"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records/1015634?associations=company&amp;associations=note'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span>
+
+<span class="tok-c"># Fetch a linked note's content (a note is a record like any other)</span>
+<span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records/1016384'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="company" data-req-variant="with-associations"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records/1011597?associations=contact&amp;associations=deal'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="deal" data-req-variant="with-associations"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records/1011624?associations=company&amp;associations=contact'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="note" data-req-variant="plain" hidden><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records/1021044'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="note" data-req-variant="with-associations"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records/1021044?associations=contact'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="retrieve-a-record">Test Request</button>
+                </div>
+              </div>
+                            <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                    <button class="response-status-tab" data-status="404"><span class="dot dot-warn"></span>404 Not Found</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                <div class="response-variant-bar" data-status-var="200"><button class="response-variant-tab" data-variant="single-record">Without associations</button><button class="response-variant-tab active" data-variant="with-associations">With associations</button></div>
+                <div class="response-variant-bar" data-status-var="404" hidden><button class="response-variant-tab active" data-variant="record-not-found">Record ID doesn&#x27;t exist</button><button class="response-variant-tab" data-variant="unknown-object-type">Object type is plural / unknown</button></div>
+                <div class="code-body" data-status="200" data-variant="with-associations" data-view="example" data-object="contact"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"source"</span>: <span class="tok-s">"Email"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>,
+    <span class="tok-p">"criticality"</span>: <span class="tok-s">"Yes"</span>,
+    <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"}]}"</span>
+  },
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"company"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    },
+    <span class="tok-p">"note"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1005567</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_notes_assoc"</span>
+        },
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1005568</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_notes_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-29T10:23:35.757096Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="with-associations" data-view="example" data-object="company"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+    <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+    <span class="tok-p">"industry"</span>: <span class="tok-s">"Hardware"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"icp"</span>: <span class="tok-s">"Strong Fit"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Analytical Engines Ltd\",\"icon_category\":\"company_overview\",\"content\":[{\"icon_category\":\"building\",\"value\":\"Hardware company; mid-market; UK-based.\"}]}"</span>
+  },
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"contact"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+        },
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1015635</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    },
+    <span class="tok-p">"deal"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_deal_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T11:00:00Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="with-associations" data-view="example" data-object="deal"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+    <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+    <span class="tok-p">"expected_close_date"</span>: <span class="tok-s">"2026-07-18T18:30:00Z"</span>,
+    <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000003</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+    <span class="tok-p">"confidence"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"forecast_category"</span>: <span class="tok-s">"Pipeline"</span>,
+    <span class="tok-p">"risk"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"status"</span>: <span class="tok-s">"Red Flag"</span>,
+    <span class="tok-p">"last_activity_date"</span>: <span class="tok-s">"2026-06-08T16:45:52Z"</span>,
+    <span class="tok-p">"ai_deal_qualification"</span>: <span class="tok-s">"{\"qualification_framework\":{\"framework_type\":\"MEDDPICC\",\"overall_score\":42,\"components\":[{\"title\":\"Metrics\",\"status\":\"Identified\",\"score\":60},{\"title\":\"Economic Buyer\",\"status\":\"Unknown\",\"score\":0}]}}"</span>
+  },
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"company"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_deal_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    },
+    <span class="tok-p">"contact"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_deal_assoc"</span>
+        },
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1015635</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_deal_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T13:00:55.857056Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="with-associations" data-view="example" data-object="note"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1021044</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"note"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"content"</span>: <span class="tok-s">"Met Ada at the Cambridge conference; wants a follow-up demo."</span>
+  },
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"contact"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_notes_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="single-record" data-view="example" data-object="note" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1021044</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"note"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"content"</span>: <span class="tok-s">"Met Ada at the Cambridge conference; wants a follow-up demo."</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="single-record" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"source"</span>: <span class="tok-s">"Email"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>,
+    <span class="tok-p">"criticality"</span>: <span class="tok-s">"Yes"</span>,
+    <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"}]}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-29T10:23:35.757096Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="single-record" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+    <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+    <span class="tok-p">"industry"</span>: <span class="tok-s">"Hardware"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"icp"</span>: <span class="tok-s">"Strong Fit"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Analytical Engines Ltd\",\"icon_category\":\"company_overview\",\"content\":[{\"icon_category\":\"building\",\"value\":\"Hardware company; mid-market; UK-based.\"}]}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T11:00:00Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="single-record" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+    <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+    <span class="tok-p">"expected_close_date"</span>: <span class="tok-s">"2026-07-18T18:30:00Z"</span>,
+    <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000003</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+    <span class="tok-p">"confidence"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"forecast_category"</span>: <span class="tok-s">"Pipeline"</span>,
+    <span class="tok-p">"risk"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"status"</span>: <span class="tok-s">"Red Flag"</span>,
+    <span class="tok-p">"last_activity_date"</span>: <span class="tok-s">"2026-06-08T16:45:52Z"</span>,
+    <span class="tok-p">"ai_deal_qualification"</span>: <span class="tok-s">"{\"qualification_framework\":{\"framework_type\":\"MEDDPICC\",\"overall_score\":42,\"components\":[{\"title\":\"Metrics\",\"status\":\"Identified\",\"score\":60},{\"title\":\"Economic Buyer\",\"status\":\"Unknown\",\"score\":0}]}}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T13:00:55.857056Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-06-12T08:13:25.348504Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"properties"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"associations"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-s">"integer"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="record-not-found" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Custom object data not found with id: 24 and objectName: contact"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="record-not-found" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Custom object data not found with id: 24 and objectName: company"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="record-not-found" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Custom object data not found with id: 24 and objectName: deal"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="record-not-found" data-view="example" data-object="note" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Custom object data not found with id: 24 and objectName: note"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="unknown-object-type" data-view="example" data-object="contact" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Unknown object type: contacts"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="unknown-object-type" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Unknown object type: companies"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-variant="unknown-object-type" data-view="example" data-object="deal" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"NOT_FOUND"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Unknown object type: deals"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="404" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"errors"</span>: [
+    {
+      <span class="tok-p">"code"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"field"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"message"</span>: <span class="tok-s">"string"</span>
+    }
+  ]
+}</code></pre></div>
+                <div class="response-caption" data-status="200">Record found.</div>
+                <div class="response-caption" data-status="404" hidden>Resource not found - the record ID does not exist for the given object type, or the object type slug itself is invalid (e.g. <code>contacts</code> instead of <code>contact</code>).</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Update a record ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="update-a-record" style="margin-top:0;" data-pagefind-weight="7">Update a record</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-patch">PATCH</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+              </div>
+              <p>Updates a record by merging the <code>properties</code> object in the request body into the record. Keys omitted from the body are left unchanged. Set a value to <code>null</code> to explicitly clear that field. Use <code>Content-Type: application/merge-patch+json</code>.</p>
+
+              <div class="callout">
+                <p class="callout-title">PATCH merges — the safe default</p>
+                <p><strong>PATCH</strong> merges - only the fields you send change; everything else is left alone. Safe for partial updates.</p>
+                <p class="muted"><strong>About <code>application/merge-patch+json</code>:</strong> it's plain JSON with one rule the server enforces - only the keys you send actually change. Everything you leave out is untouched. Setting a value to <code>null</code> clears that field.</p>
+              </div>
+
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type of the record.</td></tr>
+                  <tr><td><code>id</code> <span class="muted">integer · required</span></td><td>Numeric identifier of the record.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Request body</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>properties</code> <span class="muted">object · required</span></td><td>Partial property map. Keys present overwrite the record's current values; keys omitted are unchanged.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>The updated record with its refreshed <code>updated_at</code> timestamp.</p>
+            </div>
+
+            <div class="code-col">
+              <div class="code-object-tabs" aria-label="Object type: contact, company, deal, or note">
+                <span class="code-object-tabs-label">Object</span>
+                <button class="code-object-tab" data-object="contact">Contact</button>
+                <button class="code-object-tab" data-object="company">Company</button>
+                <button class="code-object-tab active" data-object="deal">Deal</button>
+                <button class="code-object-tab" data-object="note">Note</button>
+              </div>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-patch">PATCH</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-object="contact"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records/1015634'</span> \
+  -X <span class="tok-s">PATCH</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/merge-patch+json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "email": "ada@example.com"
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="company"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records/1011597'</span> \
+  -X <span class="tok-s">PATCH</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/merge-patch+json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "industry": "Software"
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="deal"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records/1011624'</span> \
+  -X <span class="tok-s">PATCH</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/merge-patch+json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "stage_id": 1000004
+    }
+  }'</span></code></pre></div>
+                <div class="code-body" data-object="note"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records/1021044'</span> \
+  -X <span class="tok-s">PATCH</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span> \
+  -H <span class="tok-s">'Content-Type: application/merge-patch+json'</span> \
+  -d <span class="tok-s">'{
+    "properties": {
+      "content": "Met Ada at the Cambridge conference; demo booked for Nov 12."
+    }
+  }'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="update-a-record">Test Request</button>
+                </div>
+              </div>
+                            <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                
+                <div class="code-body" data-status="200" data-variant="default" data-view="example" data-object="contact"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"contact_activity_status"</span>: <span class="tok-s">"New"</span>,
+    <span class="tok-p">"engagement"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Ada Chen\",\"icon_category\":\"contact_overview\",\"content\":[{\"icon_category\":\"briefcase\",\"value\":\"Contact at Analytical Engines Ltd; captured from an inbound email.\"}]}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-29T10:23:27.444871Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-07-10T09:15:22.501234Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example" data-object="company"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011597</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"company"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines Ltd"</span>,
+    <span class="tok-p">"domain"</span>: <span class="tok-s">"analytical-engines.com"</span>,
+    <span class="tok-p">"industry"</span>: <span class="tok-s">"Software"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"icp"</span>: <span class="tok-s">"Strong Fit"</span>,
+    <span class="tok-p">"ai_about"</span>: <span class="tok-s">"{\"title\":\"About Analytical Engines Ltd\",\"icon_category\":\"company_overview\",\"content\":[{\"icon_category\":\"building\",\"value\":\"Hardware company; mid-market; UK-based.\"}]}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T11:00:00Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-07-10T09:15:22.501234Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example" data-object="deal"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1011624</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"deal"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"name"</span>: <span class="tok-s">"Analytical Engines - Q3"</span>,
+    <span class="tok-p">"amount"</span>: <span class="tok-n">100000.0</span>,
+    <span class="tok-p">"expected_close_date"</span>: <span class="tok-s">"2026-07-18T18:30:00Z"</span>,
+    <span class="tok-p">"stage_id"</span>: <span class="tok-n">1000004</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"pipeline_id"</span>: <span class="tok-n">1000000</span>,
+    <span class="tok-p">"confidence"</span>: <span class="tok-s">"Medium"</span>,
+    <span class="tok-p">"forecast_category"</span>: <span class="tok-s">"Pipeline"</span>,
+    <span class="tok-p">"ai_deal_qualification"</span>: <span class="tok-s">"{\"qualification_framework\":{\"framework_type\":\"MEDDPICC\",\"overall_score\":42,\"components\":[{\"title\":\"Metrics\",\"status\":\"Identified\",\"score\":60},{\"title\":\"Economic Buyer\",\"status\":\"Unknown\",\"score\":0}]}}"</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-05-20T13:00:55.857056Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-07-10T09:15:22.501234Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example" data-object="note"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1021044</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"note"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"content"</span>: <span class="tok-s">"Met Ada at the Cambridge conference; demo booked for Nov 12."</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-11-05T10:00:00.000000Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-11-05T14:30:00.000000Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"properties"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"associations"</span>: <span class="tok-s">"object"</span>,
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-s">"integer"</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="200">Record updated</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Delete a record ============ -->
+        <section class="endpoint">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 id="delete-a-record" style="margin-top:0;" data-pagefind-weight="7">Delete a record</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-delete">DELETE</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+              </div>
+              <p>Permanently deletes a record by id. On success the endpoint returns <code>204 No Content</code> with an empty body - and it returns the same <code>204</code> even when no record with that id exists, so a delete is safe to repeat. The URL is the same as Retrieve and Update; only the object slug and id change.</p>
+
+              <div class="callout">
+                <p class="callout-title">Deleting is permanent</p>
+                <p>There is no recycle bin and no restore endpoint - a deleted record cannot be recovered through the API. Records that exist only inside the one you delete, such as its notes, are removed with it.</p>
+              </div>
+
+              <div class="callout">
+                <p class="callout-title">A company with deals can't be deleted</p>
+                <p>Deleting a <code>company</code> that still has one or more deals attached returns <code>409 Conflict</code>. Delete or move those deals first, then delete the company. Deleting a <code>contact</code> or a <code>deal</code> is never blocked this way.</p>
+              </div>
+
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type of the record - <code>contact</code>, <code>company</code>, <code>deal</code>, <code>note</code>, <code>task</code>, or a custom object.</td></tr>
+                  <tr><td><code>id</code> <span class="muted">integer · required</span></td><td>Numeric identifier of the record to delete.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p><code>204 No Content</code> with an empty response body - there is no JSON to parse, so check the status code. Deleting a <code>contact</code> or a <code>deal</code> always returns <code>204</code>. The one error you can hit is on a <code>company</code>: <code>409 Conflict</code> while it still has deals attached (see below).</p>
+            </div>
+
+            <div class="code-col">
+              <div class="code-object-tabs" aria-label="Object type: contact, company, deal, or note">
+                <span class="code-object-tabs-label">Object</span>
+                <button class="code-object-tab active" data-object="contact">Contact</button>
+                <button class="code-object-tab" data-object="company">Company</button>
+                <button class="code-object-tab" data-object="deal">Deal</button>
+                <button class="code-object-tab" data-object="note">Note</button>
+              </div>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-delete">DELETE</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-object="contact"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records/1015634'</span> \
+  -X <span class="tok-s">DELETE</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="company"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/company/records/1011597'</span> \
+  -X <span class="tok-s">DELETE</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="deal"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/deal/records/1011624'</span> \
+  -X <span class="tok-s">DELETE</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-body" data-object="note"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/note/records/1021044'</span> \
+  -X <span class="tok-s">DELETE</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="delete-a-record">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="204"><span class="dot dot-ok"></span>204 No Content</button>
+                    <button class="response-status-tab" data-status="409" data-object="company"><span class="dot dot-warn"></span>409 Conflict</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+
+                <div class="code-body" data-status="204" data-variant="default" data-view="example"><pre><code><span class="tok-c"># 204 No Content</span>
+<span class="tok-c"># The record was deleted. The response body is empty.</span>
+<span class="tok-c"># You also get 204 if no record with that id exists.</span></code></pre></div>
+                <div class="code-body" data-status="409" data-variant="default" data-view="example" data-object="company" hidden><pre><code>{
+  <span class="tok-p">"code"</span>: <span class="tok-s">"CONFLICT"</span>,
+  <span class="tok-p">"message"</span>: <span class="tok-s">"Cannot delete company: one or more deals still reference this company. Delete or move the deals first."</span>,
+  <span class="tok-p">"errors"</span>: [],
+  <span class="tok-p">"path"</span>: <span class="tok-s">"/api/v1/objects/company/records/1011597"</span>,
+  <span class="tok-p">"timestamp"</span>: <span class="tok-s">"2026-09-24T09:09:12.212132149"</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="204">Record deleted - no content returned. The same 204 comes back even if no record with that id exists.</div>
+                <div class="response-caption" data-status="409" hidden>Only a company returns this, and only while it still has one or more deals attached. Delete or move those deals first, then delete the company.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Feedback + pager -->
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/records" data-fb-title="Records">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/schema.html">
+            Previous
+            <strong>← Schema</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+          <a class="pager-next" href="/api/find-records.html">
+            Next
+            <strong>Find Records →</strong>
+          </a>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>

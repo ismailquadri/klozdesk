@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Schema - Dreamteam CRM API</title>
+  <meta name="description" content="Discover the objects, properties, and association types available in your Dreamteam CRM workspace." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html">Authentication</a>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html" class="active">Schema</a>
+            <ul class="nav-sublist">
+              <li><a href="#list-object-types">List object types</a></li>
+              <li><a href="#describe-object">Describe Object</a></li>
+              <li><a href="#association-definitions">Association Definitions</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/api/records.html">Records</a>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html">Users</a>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html">Meetings & transcripts</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content section" data-pagefind-body>
+        
+<script>
+  window.TEST_CONFIGS = {
+"list-object-types": {
+  "method": "GET",
+  "path": "/api/v1/objects",
+  "variables": []
+},
+"describe-object": {
+  "method": "GET",
+  "path": "/api/v1/objects/{object}",
+  "variables": [
+    {
+      "name": "object",
+      "value": "contact",
+      "required": true,
+      "type": "string"
+    }
+  ]
+},
+"association-definitions": {
+  "method": "GET",
+  "path": "/api/v1/objects/{object}/associations",
+  "variables": [
+    {
+      "name": "object",
+      "value": "contact",
+      "required": true,
+      "type": "string"
+    }
+  ],
+  "query": [
+    {
+      "name": "target_type",
+      "value": "company",
+      "type": "string"
+    }
+  ]
+}
+};
+</script>
+
+
+        <p class="eyebrow">Resources</p>
+        <h1>Schema</h1>
+        <p class="lede">Discover the objects, properties, and association types available in your Dreamteam CRM workspace. Use these endpoints to introspect the shape of any object before writing to it.</p>
+
+        <!-- ============ List object types ============ -->
+        <section class="endpoint" id="list-object-types">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">List object types</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/objects</span>
+              </div>
+              <p>Returns the short name, or <strong>slug</strong>, of every object in your workspace. That covers the standard CRM objects and every <strong>custom object</strong> you have set up. Use it to find the slug that goes in the <code>{object}</code> part of every other URL.</p>
+              <p><strong>To see only your custom objects</strong>, call <a href="#describe-object">Describe Object</a> on each slug and keep the ones where <code>object_kind</code> is <code>CUSTOM</code>. Standard objects report <code>STANDARD</code>.</p>
+              <h3>Returns</h3>
+              <p>A list of object slugs. Your custom objects sit in the same list as the standard ones.</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="list-object-types">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>[
+  <span class="tok-s">"company"</span>,
+  <span class="tok-s">"contact"</span>,
+  <span class="tok-s">"deal"</span>,
+  <span class="tok-s">"email"</span>,
+  <span class="tok-s">"meeting"</span>,
+  <span class="tok-s">"note"</span>,
+  <span class="tok-s">"recording"</span>,
+  <span class="tok-s">"task"</span>,
+  <span class="tok-s">"thread"</span>,
+  <span class="tok-s">"subscription"</span>,
+  <span class="tok-s">"project"</span>
+]</code></pre></div>
+                <div class="response-caption" data-status="200">Object types in your workspace (<code>subscription</code> and <code>project</code> here are example custom objects)</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Describe Object ============ -->
+        <section class="endpoint" id="describe-object">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Describe Object</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/objects/{object}</span>
+              </div>
+              <p>Returns the full field schema for an object type. <strong>Always call this first</strong> before creating, updating, or filtering records - it tells you the valid field names, types, and constraints (required, unique, read-only) for each object.</p>
+              <p><code>{object}</code> is the object type - <code>contact</code>, <code>company</code>, <code>deal</code>, <code>note</code>, <code>meeting</code>, <code>task</code>.</p>
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type - one of <code>contact</code>, <code>company</code>, <code>deal</code>, <code>note</code>, <code>meeting</code>, <code>task</code>.</td></tr>
+                </tbody>
+              </table>
+
+
+              <h3>Returns</h3>
+              <p>Object schema</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="describe-object">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"name"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"label"</span>: <span class="tok-s">"Contact"</span>,
+  <span class="tok-p">"plural_label"</span>: <span class="tok-s">"Contacts"</span>,
+  <span class="tok-p">"object_kind"</span>: <span class="tok-s">"STANDARD"</span>,
+  <span class="tok-p">"version"</span>: <span class="tok-n">62</span>,
+  <span class="tok-p">"fields"</span>: [
+    {
+      <span class="tok-p">"name"</span>: <span class="tok-s">"first_name"</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"TEXT"</span>,
+      <span class="tok-p">"label"</span>: <span class="tok-s">"First Name"</span>,
+      <span class="tok-p">"filterable"</span>: <span class="tok-b">true</span>,
+      <span class="tok-p">"read_only"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"unique"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"required"</span>: <span class="tok-b">true</span>
+    },
+    {
+      <span class="tok-p">"name"</span>: <span class="tok-s">"email"</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"EMAIL"</span>,
+      <span class="tok-p">"label"</span>: <span class="tok-s">"Email"</span>,
+      <span class="tok-p">"filterable"</span>: <span class="tok-b">true</span>,
+      <span class="tok-p">"read_only"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"unique"</span>: <span class="tok-b">true</span>,
+      <span class="tok-p">"required"</span>: <span class="tok-b">true</span>
+    },
+    {
+      <span class="tok-p">"name"</span>: <span class="tok-s">"created_at"</span>,
+      <span class="tok-p">"type"</span>: <span class="tok-s">"TIMESTAMP"</span>,
+      <span class="tok-p">"label"</span>: <span class="tok-s">"Created At"</span>,
+      <span class="tok-p">"filterable"</span>: <span class="tok-b">true</span>,
+      <span class="tok-p">"read_only"</span>: <span class="tok-b">true</span>,
+      <span class="tok-p">"unique"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"required"</span>: <span class="tok-b">false</span>
+    }
+  ]
+}</code></pre></div>
+                <div class="response-caption" data-status="200">Object schema</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Association Definitions ============ -->
+        <section class="endpoint" id="association-definitions">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Association Definitions</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/objects/{object}/associations</span>
+              </div>
+              <p>Returns the association definitions a type can participate in. Use the optional <code>target_type</code> query parameter to filter to definitions linking to a specific target. Reads through to the association catalog - useful for discovering valid <code>association_name</code> before reading links.</p>
+              <p>The association types available depend on the object. For example, <code>contact</code> supports <code>company</code>, <code>deal</code>, <code>note</code>, <code>meeting</code>, <code>task</code>. Other objects will have their own set - always call this endpoint to discover the valid types for the object you're working with.</p>
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>object</code> <span class="muted">string · required</span></td><td>Object type - one of <code>contact</code>, <code>company</code>, <code>deal</code>, <code>note</code>, <code>meeting</code>, <code>task</code>.</td></tr>
+                </tbody>
+              </table>
+              <h3>Query parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>target_type</code> <span class="muted">string</span></td><td>Optional - restrict to definitions linking to this target object type.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>Association definitions</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/{object}/associations</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/associations?target_type=company'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="association-definitions">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>[
+  {
+    <span class="tok-p">"association_name"</span>: <span class="tok-s">"company_contact_assoc"</span>,
+    <span class="tok-p">"label"</span>: <span class="tok-s">"Company"</span>,
+    <span class="tok-p">"source_object"</span>: <span class="tok-s">"contact"</span>,
+    <span class="tok-p">"target_object"</span>: <span class="tok-s">"company"</span>,
+    <span class="tok-p">"cardinality"</span>: <span class="tok-s">"MANY_TO_MANY"</span>,
+    <span class="tok-p">"is_default"</span>: <span class="tok-b">false</span>,
+    <span class="tok-p">"is_lookup"</span>: <span class="tok-b">true</span>,
+    <span class="tok-p">"is_active"</span>: <span class="tok-b">true</span>
+  }
+]</code></pre></div>
+                <div class="response-caption" data-status="200">Association definitions</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/schema" data-fb-title="Schema">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/errors.html">
+            Previous
+            <strong>← Errors</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+          <a class="pager-next" href="/api/records.html">
+            Next
+            <strong>Records →</strong>
+          </a>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>

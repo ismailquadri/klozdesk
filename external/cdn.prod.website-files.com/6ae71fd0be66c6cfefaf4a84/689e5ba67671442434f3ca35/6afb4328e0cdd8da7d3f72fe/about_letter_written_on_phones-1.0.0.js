@@ -1,0 +1,1 @@
+(function(){var s=document.createElement('style');s.textContent='@media (max-width:991px){.tw-pending .about-hero_sheet-title,.about-hero_sheet-title .tw-ch.is-off{visibility:visible!important}.about-hero_sheet-title .tw-ch.is-caret::after{display:none!important}}';document.head.appendChild(s)})();

@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Users - Dreamteam CRM API</title>
+  <meta name="description" content="List and retrieve the users that own records in your Dreamteam CRM workspace." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html">Authentication</a>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html">Schema</a>
+          </li>
+          <li>
+            <a href="/api/records.html">Records</a>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html" class="active">Users</a>
+            <ul class="nav-sublist">
+              <li><a href="#list-users">List Users</a></li>
+              <li><a href="#get-user">Get User by ID</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html">Meetings & transcripts</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content section" data-pagefind-body>
+        
+<script>
+  window.TEST_CONFIGS = {
+"list-users": {
+  "method": "GET",
+  "path": "/api/v1/users",
+  "variables": [],
+  "query": [
+    {
+      "name": "page",
+      "value": "1",
+      "type": "integer"
+    },
+    {
+      "name": "page_size",
+      "value": "20",
+      "type": "integer"
+    },
+    {
+      "name": "sort",
+      "value": "created_at,desc",
+      "type": "string"
+    }
+  ]
+},
+"get-user": {
+  "method": "GET",
+  "path": "/api/v1/users/{id}",
+  "variables": [
+    {
+      "name": "id",
+      "value": "1000001",
+      "required": true,
+      "type": "integer"
+    }
+  ]
+}
+};
+</script>
+
+
+        <p class="eyebrow">Resources</p>
+        <h1>Users</h1>
+        <p class="lede">List and retrieve the users who own records in your Dreamteam workspace. Users are the actors referenced by every record's owner_id and created_by fields.</p>
+
+        <!-- ============ List Users ============ -->
+        <section class="endpoint" id="list-users">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">List Users</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/users</span>
+              </div>
+              <p>Returns the users in your organization that you have access to. Sensitive fields (passwords, tokens, OTP codes, API keys) are never returned in this response.</p>
+
+              <h3>Query parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>page</code> <span class="muted">integer</span></td><td>Page number, starts at <code>1</code>. Defaults to <code>1</code>.</td></tr>
+                  <tr><td><code>page_size</code> <span class="muted">integer</span></td><td>Page size. Default 20. Max 100 - higher values are silently capped at 100 (no error). Defaults to <code>20</code>.</td></tr>
+                  <tr><td><code>sort</code> <span class="muted">string</span></td><td>Sort spec</td></tr>
+                </tbody>
+              </table>
+
+              <h3>Returns</h3>
+              <p>A paginated user list with the same shape as records list responses (<code>results</code> + <code>metadata</code>). Each user object includes <code>id</code>, <code>first_name</code>, <code>last_name</code>, <code>primary_email</code>, <code>username</code>, <code>role</code>, <code>title</code>, <code>status</code>, <code>sales_user</code>, and <code>created_at</code>.</p>
+
+              <h3>Fields</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>role</code></td><td>One of <code>admin</code>, <code>sales_manager</code>, <code>sales_member</code>.</td></tr>
+                  <tr><td><code>status</code></td><td>One of <code>ACTIVATED</code> (can log in), <code>CREATED</code> (invited, not yet activated), <code>SUSPENDED</code> (access revoked).</td></tr>
+                  <tr><td><code>sales_user</code></td><td>Boolean. Whether this user is counted against the workspace's paid sales seats.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="callout">
+                <p class="callout-title">Sensitive fields are never returned</p>
+                <p>Tokens, passwords, API keys, and OTP codes are stripped from every user response.</p>
+              </div>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/users</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/users?page=1&amp;page_size=20&amp;sort=created_at,desc'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="list-users">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1000054</span>,
+      <span class="tok-p">"first_name"</span>: <span class="tok-s">"Arjun"</span>,
+      <span class="tok-p">"last_name"</span>: <span class="tok-s">"Manager"</span>,
+      <span class="tok-p">"primary_email"</span>: <span class="tok-s">"arjun+mgr@example.com"</span>,
+      <span class="tok-p">"username"</span>: <span class="tok-s">"arjun+mgr@example.com"</span>,
+      <span class="tok-p">"role"</span>: <span class="tok-s">"sales_member"</span>,
+      <span class="tok-p">"title"</span>: <span class="tok-s">""</span>,
+      <span class="tok-p">"status"</span>: <span class="tok-s">"ACTIVATED"</span>,
+      <span class="tok-p">"sales_user"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-12T06:33:35.139985Z"</span>
+    },
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-n">1000051</span>,
+      <span class="tok-p">"first_name"</span>: <span class="tok-s">"Akarsh"</span>,
+      <span class="tok-p">"last_name"</span>: <span class="tok-s">""</span>,
+      <span class="tok-p">"primary_email"</span>: <span class="tok-s">"akarsh@example.com"</span>,
+      <span class="tok-p">"username"</span>: <span class="tok-s">"akarsh@example.com"</span>,
+      <span class="tok-p">"role"</span>: <span class="tok-s">"sales_member"</span>,
+      <span class="tok-p">"title"</span>: <span class="tok-s">"GTM - Sales"</span>,
+      <span class="tok-p">"status"</span>: <span class="tok-s">"ACTIVATED"</span>,
+      <span class="tok-p">"sales_user"</span>: <span class="tok-b">false</span>,
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-08T10:29:13.104277Z"</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-n">1</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-n">20</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-n">45</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-n">3</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-b">true</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-b">false</span>
+  }
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"results"</span>: [
+    {
+      <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+      <span class="tok-p">"first_name"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"last_name"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"primary_email"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"username"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"role"</span>: <span class="tok-s">"enum (admin, sales_manager, sales_member)"</span>,
+      <span class="tok-p">"title"</span>: <span class="tok-s">"string"</span>,
+      <span class="tok-p">"status"</span>: <span class="tok-s">"enum (ACTIVATED, CREATED, SUSPENDED)"</span>,
+      <span class="tok-p">"sales_user"</span>: <span class="tok-s">"boolean"</span>,
+      <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>
+    }
+  ],
+  <span class="tok-p">"metadata"</span>: {
+    <span class="tok-p">"page"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"page_size"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"total_elements"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"total_pages"</span>: <span class="tok-s">"integer"</span>,
+    <span class="tok-p">"has_next"</span>: <span class="tok-s">"boolean"</span>,
+    <span class="tok-p">"has_previous"</span>: <span class="tok-s">"boolean"</span>
+  }
+}</code></pre></div>
+                <div class="response-caption" data-status="200">Paginated user list</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Get User by ID ============ -->
+        <section class="endpoint" id="get-user">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Get User by ID</h2>
+              <div class="endpoint-head">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint-path">/api/v1/users/{id}</span>
+              </div>
+              <p>Sensitive fields (passwords, tokens, OTP codes, API keys) are never returned in this response.</p>
+              <h3>Path parameters</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>id</code> <span class="muted">integer · required</span></td><td>Numeric identifier of the user.</td></tr>
+                </tbody>
+              </table>
+
+
+              <h3>Returns</h3>
+              <p>User</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/users/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/users/1000001'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+                <div class="code-panel-foot">
+                  <button class="test-btn" data-endpoint="get-user">Test Request</button>
+                </div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <div class="response-actions">
+                    <button class="show-schema-toggle" data-view="example" title="Toggle schema view">Show Schema</button>
+                    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                  </div>
+                </div>
+                
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"associations"</span>: <span class="tok-b">null</span>,
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-06-12T06:24:58.831219Z"</span>,
+  <span class="tok-p">"first_name"</span>: <span class="tok-s">"Jordan"</span>,
+  <span class="tok-p">"id"</span>: <span class="tok-n">1000052</span>,
+  <span class="tok-p">"last_name"</span>: <span class="tok-s">"Rivera"</span>,
+  <span class="tok-p">"primary_email"</span>: <span class="tok-s">"jordan.rivera@example.com"</span>,
+  <span class="tok-p">"role"</span>: <span class="tok-s">"sales_member"</span>,
+  <span class="tok-p">"sales_user"</span>: <span class="tok-b">false</span>,
+  <span class="tok-p">"status"</span>: <span class="tok-s">"CREATED"</span>,
+  <span class="tok-p">"title"</span>: <span class="tok-s">""</span>,
+  <span class="tok-p">"username"</span>: <span class="tok-s">"jordan.rivera@example.com"</span>
+}</code></pre></div>
+                <div class="code-body" data-status="200" data-view="schema" hidden><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-s">"integer"</span>,
+  <span class="tok-p">"first_name"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"last_name"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"primary_email"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"username"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"role"</span>: <span class="tok-s">"enum (admin, sales_manager, sales_member)"</span>,
+  <span class="tok-p">"title"</span>: <span class="tok-s">"string"</span>,
+  <span class="tok-p">"status"</span>: <span class="tok-s">"enum (ACTIVATED, CREATED, SUSPENDED)"</span>,
+  <span class="tok-p">"sales_user"</span>: <span class="tok-s">"boolean"</span>,
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"string"</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="200">User</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/users" data-fb-title="Users">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/custom-objects.html">
+            Previous
+            <strong>← Custom objects</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+          <a class="pager-next" href="/api/pipelines.html">
+            Next
+            <strong>Pipelines →</strong>
+          </a>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>

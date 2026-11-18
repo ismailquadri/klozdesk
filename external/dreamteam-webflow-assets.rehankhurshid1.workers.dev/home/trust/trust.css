@@ -1,0 +1,61 @@
+/* Home, "AI-forward GTM teams trust Dreamteam." (section_home-trust, between the teammates and "One CRM. Two ways in.")
+   From the "Dreamteam Homepage Three" artifact (s-customers), with the logos as a static row (Sree, 15 Nov). Layout,
+   type and colours are Webflow classes (home-trust_*); this file holds only what Webflow can't express: the hover lift,
+   the stacked cross-fading quotes, and the dark film that why/ways.js scrubs away as the section rises under the dark
+   teammates section. */
+
+/* two tiles a row on phones: an odd last tile takes the full row */
+@media screen and (max-width: 767px) { .home-trust_logos > .home-trust_tile:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* Tiles: the hovered customer lifts and its logo takes its own colours */
+.home-trust_logo { transition: opacity 220ms cubic-bezier(.22, 1, .36, 1), filter 220ms cubic-bezier(.22, 1, .36, 1); }
+.home-trust_tile:hover .home-trust_logo, .home-trust_tile.is-hot .home-trust_logo,
+.home-trust_tile:focus-visible .home-trust_logo { opacity: 1; filter: none; }
+.home-trust_tile.is-hot { background-color: #fff; transform: scale(1.04); z-index: 2;
+  box-shadow: 0 10px 21px rgba(28,29,31,.08), 0 39px 39px rgba(28,29,31,.07), 0 87px 52px rgba(28,29,31,.04), inset 0 0 0 1px rgba(28,29,31,.08); }
+.home-trust_tile.has-quote { cursor: pointer; }
+.home-trust_tile:focus-visible { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1c1d1f; }
+
+/* Quotes sit on top of each other; one shows at a time */
+.home-trust_quote-item { opacity: 0; visibility: hidden; filter: blur(8px); translate: 14px 0;
+  transition: opacity 420ms cubic-bezier(.22,1,.36,1), filter 420ms cubic-bezier(.22,1,.36,1), translate 520ms cubic-bezier(.22,1,.36,1), visibility 0s 420ms; }
+.home-trust_quote-item.is-active,
+.home-trust_quote-list:not(.is-ready) > .home-trust_quote-item:first-child {
+  opacity: 1; visibility: visible; filter: none; translate: 0 0; transition-delay: 120ms, 120ms, 120ms, 0s; }
+.home-trust_quote-item.is-leaving { translate: -14px 0; }
+
+/* The lights (see why/ways.js): the teammates' dark film over this section, its strength (--dim, 1 = dark, 0 = clear)
+   set by the scroll so it always matches the teammates' background above. Without the script there is no film. */
+.home-trust_component { position: relative; isolation: isolate; }
+.home-trust_component::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #222;
+  opacity: var(--dim, 0); pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-trust_quote-item, .home-trust_tile, .home-trust_logo { transition-duration: 1ms !important; }
+  .home-trust_tile.is-hot { transform: none; }
+}
+
+/* The footer starts on a fractional pixel where the investors band overlaps it, and its dark background colour bled
+   through as a faint grey line across the white above it. Its gradient already paints the dark (the last stop runs to
+   the bottom), so the colour underneath isn't needed here (Home only; this file loads on Home). */
+.footer_component { background-color: transparent; }
+
+/* 16 Nov (Sree): the investor tiles no longer turn dark on hover (or as they cycle); they stay white, the logo just
+   comes up to full strength */
+/* (Sree, again: "no hover effect at all") the tiles look the same whether hovered, focused or cycled: white, logo as is */
+.home-investors_tile, .home-investors_tile:hover, .home-investors_tile:focus-within, .home-investors_tile.is-current {
+  background-color: #fff !important; background-image: none !important; transform: none !important; box-shadow: none !important; }
+.home-investors_tile:hover .home-investors_logo, .home-investors_tile:focus-within .home-investors_logo,
+.home-investors_tile.is-current .home-investors_logo { filter: none !important; opacity: .7 !important; transform: none !important; }
+.home-investors_tile .home-investors_glow { opacity: 0 !important; }
+
+/* 16 Nov: the logo whose quote is playing (trust.js sets .is-current, and .is-timing while the 6s run): a white tile,
+   the logo in its own colours, and a thin bar along the foot that fills until the next quote */
+.home-trust_tile { position: relative; overflow: hidden; transition: background-color .3s ease, box-shadow .3s ease; }
+.home-trust_tile.is-current { background-color: #fff; box-shadow: inset 0 0 0 1px rgba(28,29,31,.1), 0 6px 16px rgba(28,29,31,.06); }
+.home-trust_tile.is-current .home-trust_logo { opacity: 1; filter: none; }
+.home-trust_tile::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: #1c1d1f;
+  transform: scaleX(0); transform-origin: 0 50%; opacity: 0; pointer-events: none; }
+.home-trust_tile.is-timing::after { opacity: .7; animation: home-trust-timer 6s linear forwards; }
+@keyframes home-trust-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .home-trust_tile.is-timing::after { animation: none; opacity: 0; } }

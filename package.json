@@ -1,0 +1,9 @@
+{
+  "name": "dreamteam-clone",
+  "version": "1.0.0",
+  "description": "Full-fidelity local clone of dreamteam.ai",
+  "scripts": {
+    "dev": "python3 serve.py 3001",
+    "start": "python3 serve.py 3001"
+  }
+}

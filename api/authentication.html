@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Authentication - Dreamteam CRM API</title>
+  <meta name="description" content="Every request to the Dreamteam CRM API is authenticated with a Bearer token that identifies your organization. Grab a token from your profile and send it in an Authorization header." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html" class="active">Authentication</a>
+            <ul class="nav-sublist">
+              <li><a href="#get-your-api-token">Get your API token</a></li>
+              <li><a href="#using-your-token">Using your token</a></li>
+              <li><a href="#try-your-first-call">Try your first call</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html">Schema</a>
+          </li>
+          <li>
+            <a href="/api/records.html">Records</a>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html">Users</a>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html">Meetings & transcripts</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content narrow" data-pagefind-body>
+        
+<script>
+  window.TEST_CONFIGS = {
+    'try-first-call': {
+      method: 'GET',
+      path: '/api/v1/objects/{object}/records',
+      variables: [
+        { name: 'object', value: 'contact', required: true, type: 'string' }
+      ]
+    }
+  };
+</script>
+
+
+<p class="eyebrow">Guides</p>
+<h1>Authentication</h1>
+<p class="lede">Every request to the Dreamteam CRM API is authenticated with a Bearer token that identifies your organization. Grab a token from your profile, send it in an <code>Authorization</code> header, and you're set.</p>
+
+<h2 id="get-your-api-token">Get your API token</h2>
+<ol>
+  <li>Click your <strong>profile avatar</strong> (bottom-left corner)</li>
+  <li>Click <strong>View Profile</strong></li>
+  <li>Scroll to the <strong>API Token</strong> section at the bottom</li>
+  <li>Use the icons next to the masked token:
+    <ul>
+      <li><strong>Reveal</strong> - show the token in plaintext</li>
+      <li><strong>Copy</strong> - copy the token to your clipboard</li>
+      <li><strong>Reset</strong> - rotate the token; the previous one is invalidated immediately</li>
+    </ul>
+  </li>
+</ol>
+<p><img alt="API Token panel with Reveal, Copy, and Reset icons" src="/api/dreamteam-api-docs-assets/api-token.png" /></p>
+
+<blockquote>
+  <p>Your API token does not expire automatically. It stays valid until you regenerate it from your profile page. If you suspect a security breach, regenerate the token immediately - the previous token will stop working.</p>
+</blockquote>
+
+<h2 id="using-your-token">Using your token</h2>
+<p>Send every request to this base URL:</p>
+<pre><code class="language-javascript">Base URL: https://api.dreamteamcrm.ai/api/v1
+</code></pre>
+<p>Include your token in the <code>Authorization</code> header on every call. Add a <code>Content-Type</code> when you're sending a body.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Header</th>
+      <th>Value</th>
+      <th>Required</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Authorization</code></td>
+      <td><code>Bearer &lt;YOUR_TOKEN&gt;</code></td>
+      <td>Always</td>
+    </tr>
+    <tr>
+      <td><code>Content-Type</code></td>
+      <td><code>application/json</code></td>
+      <td>POST requests</td>
+    </tr>
+    <tr>
+      <td><code>Content-Type</code></td>
+      <td><code>application/merge-patch+json</code></td>
+      <td>PATCH requests</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>You don't need to send an organization id.</strong> The Bearer token already carries which workspace it belongs to. When you send a request, the API decodes the token and only ever touches that workspace's data. Switching workspaces means generating a new token in the new workspace.</p>
+
+<h2 id="try-your-first-call">Try your first call</h2>
+<p>With your token in hand, fetch all contacts in your workspace to confirm your setup works. Click <strong>Test Request</strong> to run it right here.</p>
+<div class="code-panel code-panel-request">
+  <div class="code-panel-head">
+    <span class="code-panel-endpoint">
+      <span class="method-badge method-get">GET</span>
+      <span class="code-panel-endpoint-path">/api/v1/objects/{object}/records</span>
+    </span>
+    <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+  </div>
+  <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+  <div class="code-panel-foot">
+    <button class="test-btn" data-endpoint="try-first-call">Test Request</button>
+  </div>
+</div>
+<p class="muted">You should get a JSON response with a <code>results</code> array. If you get <code>401</code>, double-check that the token was pasted whole and that the header value starts with <code>Bearer </code> (with a trailing space).</p>
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/authentication" data-fb-title="Authentication">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/">
+            Previous
+            <strong>← Introduction</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+          <a class="pager-next" href="/api/conventions.html">
+            Next
+            <strong>Conventions →</strong>
+          </a>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>

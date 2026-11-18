@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="125.115" height="125.115" viewBox="0 0 125.115 125.115" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="klos_mem_g" x1="27" y1="34" x2="98" y2="90" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#6E3FF3"/>
+    <stop offset="100%" stop-color="#371996"/>
+  </linearGradient>
+</defs>
+<g id="Frame 2147259330">
+<rect width="125.115" height="125.115" rx="16" fill="white"/>
+<g id="Vector">
+<path d="M29.29 45.23L60.59 36.05L60.34 44.72L95.84 34.50L78.15 59.07L98.00 75.24L45.70 90.50L45.96 81.83L27.00 87.40Z" fill="url(#klos_mem_g)"/>
+</g>
+</g>
+</svg>

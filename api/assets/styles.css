@@ -1,0 +1,2361 @@
+/* ===================================================================
+   Dreamteam CRM API v2 — Protocol-style docs
+   Layout: fixed left sidebar + main column. Section pages get a
+   two-col content grid with a sticky code column on the right.
+   =================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+/* Anchor links (sidebar sub-nav, in-page jumps) ease to their target instead
+   of snapping. The landing offset is already handled: h2/h3 and .endpoint carry
+   scroll-margin-top: 96px, which clears the 64px sticky topbar. */
+html { scroll-behavior: smooth; }
+/* A long, unrequested scroll animation is a vestibular trigger — honour the OS
+   setting and snap instantly for anyone who has asked for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- Theme variables ---------- */
+/* Light is the default: the bare `:root` carries it, so a page renders light
+   before app.js runs. `data-theme="dark"` is the opt-in override. */
+:root, :root[data-theme="light"] {
+  --bg: #FFFFFF;
+  --bg-panel: #FAFAF980;
+  --bg-panel-solid: #FAFAF9;
+  --bg-hover: #F1F1EF;
+  --border: #E5E5E5;
+  /* Code on a light page: a warm cream slab, NOT a dark terminal. The dark
+     block was too heavy a shape on an otherwise light page — the surrounding
+     chrome and syntax colours below are tuned for this cream surface. */
+  --bg-code: #F4F0EA;
+  --code-surface: #EFEAE0;   /* raised chrome: panel head + foot */
+  --code-border: #E5E1D9;    /* hairlines within/around a block */
+  --code-text: #1D1C1A;      /* default code text */
+  --border-hover: #C7C5C0;
+  /* Lighter rule for the page chrome (topbar underline, sidebar edge). These
+     frame the whole app, so they read heavier than a divider inside content
+     and want a softer line than the general --border. */
+  --border-chrome: #F0F0F0;
+  --text: #1D1C1A;
+  --text-muted: #6B6B6B;
+  --text-dim: #A8A5A0;
+  --accent: #4B22C4;
+  --accent-glow: rgba(75, 34, 196, 0.08);
+  --accent-hover: #371996;
+  --topbar-bg: rgba(255, 255, 255, 0.85);
+  --btn-solid-bg: #1C1C1C;
+  --btn-solid-text: #FFFFFF;
+  /* Secondary (outlined pill) — the CTA and the feedback Yes/No share it. */
+  --btn-secondary-bg: #F0F0F0;
+  --btn-secondary-bg-hover: #E6E6E6;
+  /* Success / danger. Not new colours: these are the exact greens and reds the
+     docs already use for POST vs DELETE badges and OK vs error statuses, lifted
+     into tokens so the thumbs-up/down carries the same signal. Text-weight
+     values (dark enough for 4.5:1 on the panel), not the vivid --brand-red. */
+  --positive: #226E3F;
+  --negative: #8B2211;
+  /* Keycap fill — deliberately one step LIGHTER than the search pill it rests
+     on (--bg-panel-solid), so the key reads as raised. Aliased, not a new
+     colour: white here, the hover grey on dark, where white would invert the
+     relationship and make the key look sunken. */
+  --kbd-bg: var(--bg);
+  /* Resource cards — borderless, so the fill alone carries the shape. */
+  --card-bg: #F5F1EB;
+  --card-bg-hover: #EBE7E1;
+  /* Table rules — a darker step of the beige fill, not the neutral grey
+     --border. Grey against a warm beige reads as a colour clash; keeping the
+     rule in the same warm family lets the fill and its edge belong together.
+     Sits between the header fill (#F5F1EB) and the old #E3DCCF: softer than
+     before, but still darker than the fill so the header never appears to
+     bleed past the table's edge. */
+  --table-border: #EAE4D9;
+  /* The separators BETWEEN body rows, deliberately lighter than the frame above.
+     A row rule is an internal grouping hint and doesn't need the weight of the
+     table's outer edge or its header underline — at full strength the rows read
+     as a stack of boxes rather than one table. Same warm family, ~35% lifted
+     toward white, so it still registers as a line on a white row. */
+  --table-rule: #F1EDE6;
+
+  /* Guide cards — white, hairline border, layered shadow.
+     Four layers instead of one: a tight contact shadow that anchors the card
+     to the page, then progressively wider and fainter ambient layers. Real
+     light falls off this way; a single blur reads flat and synthetic. */
+  --card-guide-bg: #FFFFFF;
+  /* Aliased, not copied: the border deliberately tracks the secondary button's
+     fill, so changing one moves both. */
+  --card-guide-border: var(--btn-secondary-bg);
+  --card-guide-shadow:
+    0 1px 1px rgba(28, 25, 23, 0.04),
+    0 2px 4px rgba(28, 25, 23, 0.04),
+    0 6px 12px rgba(28, 25, 23, 0.035),
+    0 12px 24px rgba(28, 25, 23, 0.03);
+  --card-guide-shadow-hover:
+    0 1px 2px rgba(28, 25, 23, 0.05),
+    0 3px 6px rgba(28, 25, 23, 0.05),
+    0 10px 20px rgba(28, 25, 23, 0.05),
+    0 20px 36px rgba(28, 25, 23, 0.04);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F0E0E;
+  --bg-panel: #17161485;
+  --bg-panel-solid: #171614;
+  --bg-hover: #1F1E1B;
+  --border: #2A2724;
+  /* Code slab on the near-black page (--bg #0F0E0E): a step LIGHTER, not
+     darker, so the block reads as raised off the page rather than punched
+     into it. Its chrome steps up once more again. */
+  --bg-code: #171614;
+  --code-surface: #1F1E1B;
+  --code-border: #2A2724;
+  --code-text: #E5E4E0;
+  --border-hover: #3D3934;
+  /* On dark, "lighter" means closer to the page background — a chrome line that
+     recedes rather than one that brightens. */
+  --border-chrome: #201E1C;
+  --text: #F5F0E8;
+  --text-muted: #8B857D;
+  --text-dim: #6B655D;
+  --accent: #6E3FF3;
+  --accent-glow: rgba(110, 63, 243, 0.15);
+  --accent-hover: #C4B5FD;
+  --topbar-bg: rgba(15, 14, 14, 0.7);
+  /* Pill inverts on dark so it stays high-contrast; the ring below does not. */
+  --btn-solid-bg: #F5F0E8;
+  --btn-solid-text: #0F0E0E;
+  /* Dark keeps the existing panel fill; hover darkens the same way light does. */
+  --btn-secondary-bg: var(--bg-panel);
+  --btn-secondary-bg-hover: var(--bg-hover);
+  /* The lighter cuts of the same pair — the values already used on dark. */
+  --positive: #7ACFA1;
+  --negative: #A78BFA;
+  /* Still a step lighter than the search pill — here that means the hover grey,
+     not white. See the light-theme note. */
+  --kbd-bg: var(--bg-hover);
+  /* Cards keep their dark panel fill. Hover LIGHTENS here rather than darkens:
+     against a near-black page, a darker card would recede into the background
+     instead of reading as a response. */
+  --card-bg: var(--bg-panel);
+  --card-bg-hover: var(--bg-hover);
+  /* --border is already warm on dark (#2A2724), so it needs no beige variant. */
+  --table-border: var(--border);
+  /* On dark, a "lighter" rule means one that sits CLOSER to the page background
+     rather than a brighter line — the same inversion --border-chrome already
+     encodes, so it's aliased here instead of duplicating the value. */
+  --table-rule: var(--border-chrome);
+
+  /* Guide cards on dark: a solid raised panel, not white. Shadows go much
+     deeper in opacity — a 4%-black layer is invisible on a near-black page.
+     The border falls back to --border here: dark's secondary-button fill is a
+     semi-transparent panel colour, which is invisible as a hairline. */
+  --card-guide-bg: var(--bg-panel-solid);
+  --card-guide-border: var(--border);
+  --card-guide-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    0 12px 24px rgba(0, 0, 0, 0.15);
+  --card-guide-shadow-hover:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.28),
+    0 20px 36px rgba(0, 0, 0, 0.22);
+}
+
+/* Peach ring for the solid CTA, lifted from the marketing site's primary
+   button. Theme-independent — only the pill it wraps inverts. */
+:root {
+  --btn-ring-1: #9333EA;
+  --btn-ring-2: #C4B5FD;
+  --btn-ring-3: #F9D4A0;
+  --btn-ring: linear-gradient(217deg, var(--btn-ring-1), var(--btn-ring-2) 51%, var(--btn-ring-3) 73%);
+
+  /* Code surface tokens (--bg-code, --code-surface, --code-border, --code-text)
+     are per-theme — see the two theme blocks above. Light gets a warm cream
+     slab, dark a raised panel. The panel chrome and syntax tokens are authored
+     for the DARK surface, with light-mode overrides further down re-colouring
+     them for the cream one.
+     NOTE: inline `code` chips in prose are separate — they use --bg-panel. */
+
+  /* Bright brand red. Deliberately NOT --accent: light mode darkens that to
+     #4B22C4 for text contrast, and these marks want the vivid red in both
+     themes. Only ever used for non-text marks (icons, rules, tints), so the
+     3:1 non-text minimum applies rather than 4.5:1 — it clears that. */
+  --brand-red: #6E3FF3;
+  --card-icon: var(--brand-red);
+
+  /* One banner treatment, shared by blockquotes and callouts. Neutral, NOT red:
+     a red tint on a red rule reads as an error/danger state, and these banners
+     are ordinary asides ("Assigning stages to deals"), not warnings. Red is now
+     reserved for things that actually are exceptional.
+     All four alias existing tokens, so the banner follows the theme for free:
+       bg    → white in light, the raised dark panel on dark  (--card-guide-bg)
+       rule  → near-black in light, near-white on dark        (--text)
+       chips → a cut-out of the page, hairlined in grey */
+  --banner-bg: var(--card-guide-bg);
+  --banner-border: var(--border);
+  --banner-rule: var(--text);
+  --banner-chip-bg: var(--bg);
+  --banner-chip-border: var(--border);
+}
+
+/* ---------- Fonts ---------- */
+/* PP Telegraf — display face. Self-hosted (not on Google Fonts); licensed
+   webfont, so the files ship publicly with the docs.
+   Three cuts, one per weight actually used: 400 (feedback buttons), 500
+   (secondary CTA), 600 (h1). Each real weight must be declared — if a
+   requested weight has no face, the browser substitutes the nearest one and
+   the text silently renders at the wrong weight. */
+@font-face {
+  font-family: 'PP Telegraf';
+  src: url('fonts/PPTelegraf-Regular.woff2') format('woff2'),
+       url('fonts/PPTelegraf-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Telegraf';
+  src: url('fonts/PPTelegraf-Medium.woff2') format('woff2'),
+       url('fonts/PPTelegraf-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Telegraf';
+  src: url('fonts/PPTelegraf-Semibold.woff2') format('woff2'),
+       url('fonts/PPTelegraf-Semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Geist Mono — code face. SIL OFL (see fonts/GeistMono-OFL.txt).
+   Replaces the old 'SF Mono', Monaco stack: those are macOS-only system fonts
+   that can't be embedded, so every non-Mac reader of the public docs was
+   falling through to whatever monospace their OS shipped. Self-hosting means
+   code renders identically everywhere.
+
+   ONE variable font covers the whole 100–900 range, so the three weights the
+   stylesheet asks for (400 body code, 600, 700 method badges) are all real
+   interpolated instances — nothing is synthesised. 70KB total, vs ~280KB for
+   the equivalent static cuts.
+   Upstream ships this as `GeistMono[wght].woff2`; renamed because square
+   brackets in a URL path are trouble on S3/CloudFront. */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'PP Telegraf', var(--font-sans);
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale — seven steps, and nothing off-scale. Every font-size in this
+     file references one of these; a literal px value is a bug. Previously there
+     were thirteen sizes, six of them inside a 3px band (10/11/11.5/12/12.5/13)
+     where the steps aren't perceptible, so they read as drift rather than
+     hierarchy. Each step below has a distinct job:
+
+       h1/h2/h3  document structure
+       body      running prose
+       ui        interactive chrome — nav, buttons, tables, card copy
+       sm        code, labels, tabs, captions
+       xs        badges, keycaps, type hints
+
+     --text-h3 is deliberately 3px above --text-body (it was 1px, which is why
+     card and section headings read as weak). --text-h3 is shared with .lede;
+     weight and colour separate them, not size. */
+  --text-h1: 36px;
+  --text-h2: 22px;
+  --text-h3: 18px;
+  --text-body: 15px;
+  --text-ui: 14px;
+  --text-sm: 13px;
+  --text-xs: 11px;
+}
+
+/* Ligatures OFF everywhere the mono face is used. In API docs a reader may be
+   transcribing a header value or an operator by eye, and a fused `->` or `!=`
+   glyph misrepresents how many characters are actually there. Ligatures ride on
+   `calt` as well as `liga`, so both properties are needed to fully suppress
+   them — belt and braces, and it survives a future font swap. */
+code, pre, kbd, samp,
+.kbd, .method-badge, .endpoint-path, .code-panel-endpoint-path,
+.url-preview, .body-editor, .kv-row input, .response-body {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.shell, .topbar, .sidebar, .main, .content { position: relative; z-index: 1; }
+
+a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
+a:hover { color: var(--accent-hover); }
+
+/* ---------- Shell ---------- */
+.shell {
+  display: grid;
+  grid-template-columns: 288px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  border-right: 1px solid var(--border-chrome);
+  padding: 20px 0 40px;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 24px 32px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: var(--text-body);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.sidebar-brand:hover { color: var(--text); }
+.sidebar-brand img { height: 25px; width: auto; }
+/* Theme-aware logo swap: dark-fill wordmark in light mode, white wordmark in
+   dark mode. Both <img> tags render; CSS toggles which is visible. */
+/* Unscoped from .sidebar-brand so the footer wordmark swaps too. Sizing stays
+   per-container; only the light/dark choice is shared. */
+/* These own `display` outright. Previously the container rules
+   (.topbar-brand img { display: block }, specificity 0,1,1) outranked
+   `.brand-logo-light { display: none }` (0,1,0), so in LIGHT mode the white
+   wordmark was never hidden — invisible on white, but still occupying its full
+   width. The brand box was therefore ~2x wider in light than in dark, and the
+   header re-flowed on every theme switch. Containers now set size only. */
+.brand-logo-dark { display: block; }
+.brand-logo-light { display: none; }
+[data-theme="dark"] .brand-logo-dark { display: none; }
+[data-theme="dark"] .brand-logo-light { display: block; }
+.sidebar-brand .brand-divider { width: 1px; height: 18px; background: var(--border); }
+.sidebar-brand .brand-name { font-weight: 600; font-size: var(--text-body); }
+
+.nav-group { margin-bottom: 24px; }
+.nav-group-title {
+  padding: 4px 24px 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.nav-list {
+  border-left: 1px solid var(--border);
+  margin-left: 24px;
+  padding-left: 0;
+  list-style: none;
+}
+.nav-list li { margin: 0; }
+.nav-list a {
+  display: block;
+  padding: 6px 16px;
+  color: var(--text-muted);
+  font-size: var(--text-ui);
+  text-decoration: none;
+  border-left: 1px solid transparent;
+  margin-left: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.nav-list a:hover { color: var(--text); }
+/* --brand-red (#6E3FF3), not --accent — light mode darkens --accent to #4B22C4
+   for text contrast, so the bar was a visibly different red from the resource
+   card icons. This is the same token those icons use.
+   1px -> 3px: the border is part of the box, so the extra 2px would push the
+   label right. padding-left drops 16px -> 14px to absorb it, keeping the active
+   label on the same baseline column as its siblings while the bar itself grows
+   rightward from the rail. */
+.nav-list a.active {
+  color: var(--text);
+  border-left-color: var(--brand-red);
+  border-left-width: 3px;
+  padding-left: 14px;
+  font-weight: 500;
+}
+.nav-sublist { list-style: none; padding-left: 16px; margin: 2px 0 4px; }
+.nav-sublist a {
+  padding: 4px 12px;
+  font-size: var(--text-sm);
+}
+
+/* ---------- Main column ---------- */
+.main { display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--border-chrome);
+  position: sticky;
+  top: 0;
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  z-index: 20;
+  height: 64px;
+}
+
+.searchbar {
+  flex: 1;
+  max-width: 520px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px 7px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: var(--text-ui);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.searchbar:hover { border-color: var(--border-hover); }
+.searchbar svg { width: 15px; height: 15px; flex-shrink: 0; }
+.searchbar .kbd {
+  margin-left: auto;
+  padding: 1px 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+}
+
+/* The .topbar-links nav (a permanent "Support" link) was removed — support is
+   now offered in the feedback row, at the point a reader says a page didn't
+   help. It carried the margin-left:auto that held the right edge of the topbar,
+   so the theme toggle inherits that job. */
+.topbar .icon-btn { margin-left: auto; }
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 7px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.icon-btn:hover { color: var(--text); background: var(--bg-hover); }
+.icon-btn svg { width: 16px; height: 16px; }
+:root[data-theme="dark"] .icon-btn .sun { display: block; }
+:root[data-theme="dark"] .icon-btn .moon { display: none; }
+:root[data-theme="light"] .icon-btn .sun { display: none; }
+:root[data-theme="light"] .icon-btn .moon { display: block; }
+
+/* ---------- Content ---------- */
+.content {
+  padding: 56px 64px 96px;
+  max-width: 1360px;
+  width: 100%;
+  /* Center content inside .main so ultra-wide monitors get symmetric
+     whitespace rather than piling all the leftover space on the right.
+     No effect when content fills main. */
+  margin-left: auto;
+  margin-right: auto;
+}
+.content.narrow { max-width: 900px; }
+.content.section { max-width: 1800px; }
+/* Anchor targets on endpoint sections need to clear the sticky topbar
+   so the h2 lands below it, not behind it. */
+.endpoint { scroll-margin-top: 96px; }
+
+/* Endpoint grid — each endpoint block is its own 2-col so prose and
+   code panels stay aligned per section. Code panel sticks while its
+   section's prose scrolls. */
+.endpoint-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 460px;
+  gap: 56px;
+  align-items: start;
+}
+@media (min-width: 1600px) {
+  .endpoint-grid { grid-template-columns: minmax(0, 1fr) 560px; }
+}
+@media (min-width: 2100px) {
+  /* On genuinely wide monitors, give the code column more room and
+     let the section deck stretch further before centering kicks in. */
+  .content.section { max-width: 2000px; }
+  .endpoint-grid { grid-template-columns: minmax(0, 1fr) 680px; }
+}
+.endpoint-grid > .prose-col { min-width: 0; }
+.endpoint-grid > .code-col { min-width: 0; }
+.endpoint-grid > .code-col .code-panel { margin: 0; }
+.endpoint-grid > .code-col .code-panel + .code-panel { margin-top: 16px; }
+/* Sticky-scroll the entire code column together, so both Request and
+   Response panels stay visible as the prose scrolls. When the panels
+   overflow the viewport, the column scrolls internally first — and
+   once it hits its own top/bottom, the page keeps scrolling (default
+   `overscroll-behavior: auto`, no `contain`). */
+.endpoint-grid > .code-col {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+/* Hide scrollbar unless hovering — cleaner look */
+.endpoint-grid > .code-col::-webkit-scrollbar { width: 4px; }
+.endpoint-grid > .code-col::-webkit-scrollbar-thumb { background: transparent; }
+.endpoint-grid > .code-col:hover::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Request panel — method+path inline in the header */
+.code-panel-request .code-panel-head { padding: 8px 12px; }
+.code-panel-endpoint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: #E5E4E0;
+  overflow: hidden;
+}
+.code-panel-endpoint .method-badge { font-size: var(--text-xs); }
+.code-panel-endpoint-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Response panel — status tab row (200 / 400 / 404 ...) */
+.response-status-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+}
+.response-status-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: #8B857D;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.response-status-tab:hover { color: #F5F0E8; }
+.response-status-tab.active {
+  color: #F5F0E8;
+  background: #2A2724;
+}
+.response-status-tab .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.response-status-tab .dot-ok    { background: #57BB8A; box-shadow: 0 0 8px rgba(87, 187, 138, 0.5); }
+.response-status-tab .dot-warn  { background: #F1D06B; box-shadow: 0 0 8px rgba(241, 208, 107, 0.5); }
+.response-status-tab .dot-err   { background: #7C3AED; box-shadow: 0 0 8px rgba(228, 93, 74, 0.5); }
+.response-status-tab .dot-gray  { background: #8B857D; }
+
+.response-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.show-schema-toggle {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: #8B857D;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.show-schema-toggle:hover { color: #F5F0E8; }
+.show-schema-toggle.active {
+  color: #F5F0E8;
+  background: #2A2724;
+}
+
+/* Variant sub-tab row (With / Without associations, etc) */
+.response-variant-bar,
+.request-variant-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  background: #14130F;
+  border-bottom: 1px solid #2A2724;
+  overflow-x: auto;
+}
+/* Explicit display:flex above overrides the browser's default [hidden]
+   rule, so we need to restore it. Without this, all status' variant bars
+   render at once. */
+.response-variant-bar[hidden],
+.request-variant-bar[hidden] { display: none; }
+.response-variant-tab,
+.request-variant-tab {
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #8B857D;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.response-variant-tab:hover,
+.request-variant-tab:hover { color: #F5F0E8; }
+.response-variant-tab.active,
+.request-variant-tab.active {
+  color: #F5F0E8;
+  border-color: #3D3934;
+  background: #2A2724;
+}
+
+/* Caption under a response body */
+.response-caption {
+  padding: 10px 14px 14px;
+  background: #14130F;
+  border-top: 1px solid #2A2724;
+  color: #8B857D;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+@media (max-width: 1200px) {
+  .content { padding: 40px 40px 80px; }
+  .endpoint-grid { grid-template-columns: 1fr; gap: 24px; }
+  .endpoint-grid > .code-col .code-panel { position: static; }
+}
+@media (max-width: 720px) {
+  .content { padding: 24px 20px 60px; }
+  /* Retune the scale step itself rather than overriding h1 — h1 keeps exactly
+     one font-size declaration, and the !important goes away. */
+  :root { --text-h1: 28px; }
+}
+
+/* ---------- Typography ---------- */
+h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-h1);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+  color: var(--text);
+}
+.eyebrow {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px;
+}
+.lede {
+  font-size: var(--text-h3);
+  color: var(--text-muted);
+  margin: 0 0 32px;
+  line-height: 1.55;
+  max-width: 720px;
+}
+h2 {
+  font-size: var(--text-h2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 56px 0 20px;
+  scroll-margin-top: 96px;
+}
+/* Endpoint-page prose-col h2s override this with an inline margin-top:0
+   (they sit at the top of their grid cell). Everywhere else, keep the
+   full 56px so first and subsequent H2s space out evenly. */
+h3 {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  color: var(--text);
+  margin: 28px 0 12px;
+  scroll-margin-top: 96px;
+}
+p { margin: 0 0 16px; color: var(--text); }
+p.muted, .muted { color: var(--text-muted); }
+ul, ol { margin: 0 0 20px; padding-left: 24px; color: var(--text); }
+li { margin: 4px 0; }
+
+/* Inline code */
+p code, li code, td code, h3 code, h2 code, blockquote code {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+}
+
+/* Standalone code blocks (from ``` fences in guide pages) — only match
+   the direct children of .content so we don't touch the request/response
+   panels, which style themselves. Black in both themes, same as the panels. */
+.content > pre {
+  background: var(--bg-code);
+  border: 1px solid var(--code-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--code-text);
+  margin: 20px 0;
+}
+.content > pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+/* Blockquote — the banner treatment (see .callout, which shares it). Reset
+   inner p margins so the text aligns cleanly with the box padding. */
+blockquote {
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
+  border-left: 3px solid var(--banner-rule);
+  padding: 12px 16px;
+  border-radius: 0 10px 10px 0;
+  margin: 20px 0;
+  color: var(--text);
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+blockquote p { margin: 0; }
+blockquote p + p { margin-top: 8px; }
+
+/* Images in guide content — cap size so the token screenshot stays
+   readable but doesn't dominate the page. */
+.content img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: 320px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin: 24px 0;
+  box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.4);
+}
+:root[data-theme="light"] .content img {
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- CTAs ---------- */
+.cta-row { display: flex; gap: 10px; margin: 24px 0 8px; flex-wrap: wrap; }
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: var(--text-ui);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.cta::after { content: '→'; margin-left: 2px; }
+/* Same reason as .cta-primary::after — an empty ::after still takes a `gap`,
+   which made the right padding 8px wider than the left. */
+.cta.cta-plain::after { display: none; }
+/* Solid pill inside a peach gradient ring — the marketing site's primary
+   button. The ring is a 2px transparent border filled via background-clip
+   (padding-box pill over border-box gradient), so it needs no wrapper element.
+   The label sits in the display face at 600, as it does on marketing. */
+/* Metrics are the marketing button's, verbatim: a 36px badge in a 44px pill
+   with 4px of padding on top, right and bottom, so the space around the badge
+   is uniform on those three sides (4 + 36 + 4 = 44). Marketing hangs the ring
+   on a sibling element and sets height:2.75rem; here the ring is the border, so
+   the height is 44 + 2px of border per side = 48px to keep the pill itself 44. */
+.cta-primary {
+  height: 48px;
+  gap: 24px;
+  padding: 4px 4px 4px 24px;
+  border: 2px solid transparent;
+  font-family: var(--font-display);
+  font-size: var(--text-ui);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.003em;
+  color: var(--btn-solid-text);
+  background:
+    linear-gradient(var(--btn-solid-bg), var(--btn-solid-bg)) padding-box,
+    var(--btn-ring) border-box;
+}
+/* The badge replaces the shared '→' affordance. `display: none` rather than
+   `content: ''` — an empty ::after is still a flex item, so it would collect a
+   full `gap` (24px) before it and push the badge off the right padding. */
+.cta-primary::after { display: none; }
+/* Needed because the global `a:hover` rule outranks `.cta-primary` on colour. */
+.cta-primary:hover { color: var(--btn-solid-text); }
+/* Marketing's hover, verbatim: the badge rotates 45° clockwise, swinging the
+   ↗ arrow round to point →. Their easing is `all .3s ease-in-out`. */
+.cta-primary:hover .cta-badge { transform: rotate(45deg); }
+
+.cta-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--btn-solid-text);
+  color: var(--btn-solid-bg);
+  transition: transform 0.3s ease-in-out;
+}
+.cta-badge svg { width: 20px; height: 20px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-badge { transition: none; }
+  .cta-primary:hover .cta-badge { transform: none; }
+}
+/* Borderless — the fill alone carries the shape. The transparent 1px border
+   inherited from .cta is kept so the box matches .cta-primary's geometry. */
+.cta-secondary {
+  font-family: var(--font-display);
+  background: var(--btn-secondary-bg);
+  color: var(--text);
+}
+.cta-secondary:hover { background: var(--btn-secondary-bg-hover); color: var(--text); }
+
+/* Arrow-link (Read more →) */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  text-decoration: none;
+}
+.arrow-link:hover { color: var(--accent-hover); }
+.arrow-link::after { content: '→'; transition: transform 0.15s ease; }
+.arrow-link:hover::after { transform: translateX(2px); }
+
+/* ---------- Cards ---------- */
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 24px 0 32px;
+}
+
+/* Guide cards. Same radius and padding as .card above so the two rows on the
+   landing page read as one family — these just carry a border and shadow
+   instead of a tinted fill. */
+.card-plain {
+  /* Column flex so the arrow-link can be pushed to the bottom edge with an
+     auto top margin. Without it the link sits directly under the copy, and
+     cards with shorter descriptions float their link higher than their
+     neighbours. */
+  display: flex;
+  flex-direction: column;
+  background: var(--card-guide-bg);
+  border: 1px solid var(--card-guide-border);
+  border-radius: 14px;
+  padding: 24px 20px 20px;
+  box-shadow: var(--card-guide-shadow);
+  text-decoration: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-plain:hover {
+  box-shadow: var(--card-guide-shadow-hover);
+  transform: translateY(-2px);
+}
+/* The lift is decorative; honour a reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .card-plain { transition: box-shadow 0.2s ease; }
+  .card-plain:hover { transform: none; }
+}
+.card-plain h3 { margin: 0 0 6px; font-size: var(--text-body); color: var(--text); }
+/* The bottom margin is the *minimum* gap above the arrow-link — on the tallest
+   card the link's `margin-top: auto` has no slack to absorb, so this is what
+   sets the spacing there. Shorter cards get more, from the auto margin. */
+.card-plain p { color: var(--text-muted); font-size: var(--text-ui); margin: 0 0 20px; line-height: 1.5; }
+/* margin-top: auto eats the leftover vertical space, pinning the link to the
+   bottom. align-self keeps the link box hugging its text rather than
+   stretching the full card width. */
+.card-plain .arrow-link {
+  font-size: var(--text-sm);
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* Resource cards with icons */
+/* Borderless — the transparent 1px border is kept so the card keeps its exact
+   size and the grid columns don't reflow. */
+.card {
+  position: relative;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 24px 20px 20px;
+  transition: background 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card:hover { background: var(--card-bg-hover); color: inherit; }
+/* Bare icon — no chip. The 32px box is kept so the icon stays optically
+   aligned with the card padding and the spacing below it doesn't shift. */
+.card-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  color: var(--card-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.card-icon svg { width: 24px; height: 24px; }
+.card h3 { margin: 0 0 6px; font-size: var(--text-body); color: var(--text); position: relative; }
+.card p { color: var(--text-muted); font-size: var(--text-ui); margin: 0; line-height: 1.5; position: relative; }
+
+/* ---------- Icon motion ----------
+   Hover animation for the resource-card icons, the feedback thumbs and the
+   theme toggle — hand-rolled on the inline SVGs already in the markup. The
+   React animated-icon packages cost ~118 kB gzip (React runtime + motion) to
+   do this and ship no database or funnel glyph; this costs 0 kB of JS.
+
+   Each animation says something about what the card does, rather than being
+   decoration: the schema sheets separate, the records lid lifts, the funnel
+   passes something through, the user nods, the pipeline stages fire in order.
+
+   Two things every SVG animation here depends on:
+   - `transform-box: fill-box`, or transform-origin resolves against the whole
+     24×24 viewBox instead of the shape, and every rotate/scale drifts off-axis.
+   - `overflow: visible`, because an SVG clips to its viewBox by default and
+     these shapes already sit flush against it — a 2px lift would be sheared. */
+.card-icon svg *,
+.icon-btn svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.card-icon svg,
+.feedback-btn svg,
+.icon-btn svg { overflow: visible; }
+
+/* Shared beats. Only the midpoint is declared: the implicit 0%/100% is the
+   element's resting transform, so each shape returns exactly where it started
+   and these compose with the static transforms already on some icons. */
+@keyframes ic-lift  { 50% { transform: translateY(-2.5px); } }
+@keyframes ic-drop  { 50% { transform: translateY(2px); } }
+@keyframes ic-nudge { 50% { transform: translateY(-0.5px); } }
+
+/* Schema — the three sheets pull apart and settle. */
+.card:hover [data-icon="schema"] .ic-top { animation: ic-lift 0.5s ease-out; }
+.card:hover [data-icon="schema"] .ic-mid { animation: ic-nudge 0.5s ease-out; }
+.card:hover [data-icon="schema"] .ic-bot { animation: ic-drop 0.5s ease-out; }
+
+/* Records — the lid lifts off the cylinder; the band follows a beat later. */
+.card:hover [data-icon="records"] .ic-lid  { animation: ic-lift 0.5s ease-out; }
+.card:hover [data-icon="records"] .ic-band { animation: ic-nudge 0.5s ease-out 0.05s; }
+
+/* Find Records — the funnel squeezes and rebounds, as if something passed
+   through it. Anchored at the rim so it drains downward rather than pinching
+   about its middle. */
+@keyframes ic-filter {
+  35%  { transform: scaleY(0.86); }
+  70%  { transform: scaleY(1.06); }
+  100% { transform: scaleY(1); }
+}
+.card:hover [data-icon="find"] .ic-funnel {
+  transform-origin: top center;
+  animation: ic-filter 0.5s ease-out;
+}
+
+/* Users — the head nods and the shoulders give under it. */
+@keyframes ic-bob { 45% { transform: translateY(-2px); } }
+.card:hover [data-icon="users"] .ic-head      { animation: ic-bob 0.5s ease-out; }
+.card:hover [data-icon="users"] .ic-shoulders { animation: ic-nudge 0.5s ease-out 0.06s; }
+
+/* Pipelines — the four stages fire in sequence. The rects are authored
+   clockwise from top-left, so the stagger reads as a circuit of the grid. */
+@keyframes ic-pop { 40% { transform: scale(0.62); } }
+.card:hover [data-icon="pipelines"] rect { animation: ic-pop 0.45s ease-out; }
+.card:hover [data-icon="pipelines"] rect:nth-of-type(2) { animation-delay: 0.06s; }
+.card:hover [data-icon="pipelines"] rect:nth-of-type(3) { animation-delay: 0.12s; }
+.card:hover [data-icon="pipelines"] rect:nth-of-type(4) { animation-delay: 0.18s; }
+
+/* Recipes — the route's two endpoints fire in sequence, tracing the flow
+   from the start node to the end the way a recipe chains one call to the next. */
+.card:hover [data-icon="recipes"] .ic-start { animation: ic-pop 0.45s ease-out; }
+.card:hover [data-icon="recipes"] .ic-end   { animation: ic-pop 0.45s ease-out 0.12s; }
+
+/* Feedback thumbs — the gesture itself. Rotating the whole <svg> (an HTML-laid
+   -out box) rather than the path, so no fill-box is needed here. */
+@keyframes ic-thumb-up   { 40% { transform: rotate(-14deg) translateY(-1.5px); } }
+@keyframes ic-thumb-down { 40% { transform: rotate(14deg) translateY(2.5px); } }
+.feedback-btn[data-vote="yes"]:hover svg { animation: ic-thumb-up 0.45s ease-out; }
+.feedback-btn[data-vote="no"]:hover svg  { animation: ic-thumb-down 0.45s ease-out; }
+
+/* Theme toggle — the sun's rays spin, its core pulses; the moon rocks back.
+   The eight rays sit at 45° intervals, so a 90° turn lands on an identical
+   configuration: the spin ends where it began with no visible snap back. */
+@keyframes ic-spin  { to  { transform: rotate(90deg); } }
+@keyframes ic-pulse { 50% { transform: scale(1.18); } }
+@keyframes ic-rock  { 40% { transform: rotate(-18deg); } }
+.icon-btn:hover .sun path   { animation: ic-spin 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.icon-btn:hover .sun circle { animation: ic-pulse 0.6s ease-out; }
+.icon-btn:hover .moon       { animation: ic-rock 0.5s ease-out; }
+
+/* Motion here is pure decoration — it carries no information the icon and its
+   label don't already give, so it's the first thing to drop. */
+@media (prefers-reduced-motion: reduce) {
+  /* Both the svg and its children — the moon is the <svg> element itself, so a
+     child-only selector would leave it rocking. */
+  .card:hover .card-icon svg, .card:hover .card-icon svg *,
+  .feedback-btn:hover svg, .feedback-btn:hover svg *,
+  .icon-btn:hover svg, .icon-btn:hover svg * { animation: none; }
+}
+
+/* ---------- Endpoint sections ---------- */
+.endpoint {
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  margin-top: 56px;
+}
+.endpoint:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  flex-wrap: wrap;
+}
+/* When endpoint-head follows h2, it reads as a subtitle — tighten the gap
+   and let h2 sit at the top of the grid cell (aligns with code panel top). */
+.prose-col h2 + .endpoint-head { margin-top: -4px; margin-bottom: 24px; }
+
+/* HTTP method badges */
+.method-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.method-get     { background: rgba(74, 144, 217, 0.15); color: #6BAEEB; }
+.method-post    { background: rgba(87, 187, 138, 0.15); color: #7ACFA1; }
+.method-patch   { background: rgba(229, 184, 33, 0.18); color: #F1D06B; }
+.method-put     { background: rgba(176, 117, 206, 0.15); color: #C48CE2; }
+.method-delete  { background: rgba(228, 93, 74, 0.15); color: #A78BFA; }
+:root[data-theme="light"] .method-get     { background: rgba(52, 128, 199, 0.10); color: #2C6FB0; }
+:root[data-theme="light"] .method-post    { background: rgba(46, 160, 84, 0.10); color: #226E3F; }
+:root[data-theme="light"] .method-patch   { background: rgba(191, 138, 0, 0.12); color: #7A5A00; }
+:root[data-theme="light"] .method-put     { background: rgba(155, 89, 182, 0.10); color: #6A3F86; }
+:root[data-theme="light"] .method-delete  { background: rgba(190, 40, 20, 0.10); color: #8B2211; }
+
+/* No .code-panel-scoped override needed: the panel header is cream on light, so
+   badges there want the same light-surface colours as the prose ones above. */
+
+.endpoint-path {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+/* ---------- Object-type tabs (Contact / Company / Deal) ----------
+   Sits above a request or response code panel; the corresponding
+   `.code-body[data-object]` blocks in the enclosing <section.endpoint>
+   are shown/hidden by the object-tab handler in app.js. The bar has
+   no container background — the tab buttons carry their own affordance,
+   which keeps a clean gap between the bar and the code panel below. */
+.code-object-tabs {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 20px 0 12px;
+}
+.code-object-tabs-label {
+  padding: 0 8px 0 2px;
+  color: #8B857D;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.code-object-tab {
+  padding: 4px 14px;
+  /* Solid, not transparent — the page's grid pattern was showing through
+     transparent tabs and clashed with the tab pills against the backdrop. */
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border);
+  color: #8B857D;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.code-object-tab:hover { color: #F5F0E8; border-color: #3D3934; }
+.code-object-tab.active {
+  color: #F5F0E8;
+  border-color: #3D3934;
+  background: #2A2724;
+}
+:root[data-theme="light"] .code-object-tab {
+  border-color: #D6D0C4;
+  color: #6B655D;
+}
+:root[data-theme="light"] .code-object-tab:hover { color: #1D1C1A; border-color: #B9B1A2; }
+:root[data-theme="light"] .code-object-tab.active {
+  color: #1D1C1A;
+  background: #E5E1D9;
+  border-color: #B9B1A2;
+}
+
+/* ---------- Recipe step tabs (a step that is two chained calls) ----------
+   Some recipe steps are really two dependent calls (meeting → recording id,
+   then read the recording). One pill-tab bar swaps the whole request+response
+   view for the step — the same interaction as the object tabs above, but
+   scoped to the step and with no {object} path rewriting. Visual is kept
+   identical to .code-object-tab on purpose. Toggling the .recipe-step-view
+   wrapper composes cleanly with the response panel's own status/view filter:
+   the wrapper hides the whole call, the inner panel still manages its 200
+   body. Handler: __initRecipeStepTabs in app.js. */
+.recipe-step-tabs {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.recipe-step-tab {
+  padding: 4px 14px;
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border);
+  color: #8B857D;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.recipe-step-tab:hover { color: #F5F0E8; border-color: #3D3934; }
+.recipe-step-tab.active {
+  color: #F5F0E8;
+  border-color: #3D3934;
+  background: #2A2724;
+}
+:root[data-theme="light"] .recipe-step-tab {
+  border-color: #D6D0C4;
+  color: #6B655D;
+}
+:root[data-theme="light"] .recipe-step-tab:hover { color: #1D1C1A; border-color: #B9B1A2; }
+:root[data-theme="light"] .recipe-step-tab.active {
+  color: #1D1C1A;
+  background: #E5E1D9;
+  border-color: #B9B1A2;
+}
+
+/* ---------- Pagefind search UI theming ----------
+   Pagefind's Component UI (trigger button AND the search modal popup) is
+   driven entirely by --pf-* custom properties, and it switches theme only
+   on the `data-pf-theme` attribute — it does NOT read prefers-color-scheme.
+   app.js sets data-pf-theme alongside data-theme; here we remap every --pf-*
+   colour onto our own palette so the whole search experience matches the
+   docs in both modes. Our :root[data-theme="…"] selector (specificity 0,2,0)
+   outranks Pagefind's own :root / [data-pf-theme] blocks (0,1,0), so these
+   win without !important. */
+:root[data-theme="dark"] {
+  --pf-background: #171614;
+  --pf-text: #F5F0E8;
+  --pf-text-secondary: #8B857D;
+  --pf-text-muted: #8B857D;
+  --pf-border: #2A2724;
+  --pf-border-focus: #3D3934;
+  --pf-hover: #1F1E1B;
+  --pf-mark: #C4B5FD;
+  --pf-modal-backdrop: rgba(0, 0, 0, 0.72);
+  --pf-skeleton: #1F1E1B;
+}
+:root[data-theme="light"] {
+  --pf-background: #FFFFFF;
+  --pf-text: #1D1C1A;
+  --pf-text-secondary: #6B6B6B;
+  --pf-text-muted: #6B6B6B;
+  --pf-border: #E5E5E5;
+  --pf-border-focus: #C7C5C0;
+  --pf-hover: #F1F1EF;
+  --pf-mark: #4B22C4;
+  --pf-modal-backdrop: rgba(0, 0, 0, 0.4);
+  --pf-skeleton: #F1F1EF;
+}
+
+/* Pagefind search trigger — the pill in the topbar.
+   Colours now come from the --pf-* vars above; these !important rules only
+   force the pill shape / sizing, since Pagefind's high-specificity selectors
+   (three chained :is(*, #\#)) would otherwise win on those properties. */
+pagefind-modal-trigger .pf-trigger-btn {
+  flex: 1 !important;
+  max-width: 520px !important;
+  background: var(--bg-panel-solid) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 999px !important;
+  padding: 7px 14px !important;
+  color: var(--text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--text-ui)!important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+pagefind-modal-trigger .pf-trigger-btn:hover {
+  border-color: var(--border-hover) !important;
+}
+/* The rule above is written for the full pill (flex: 1, max-width 520px) and
+   applies to BOTH triggers — which made the compact icon's button flex to fill
+   the topbar and shove the theme toggle off the right edge. Pin it to a square
+   so it takes only the space an icon needs. */
+.search-compact .pf-trigger-btn {
+  flex: none !important;
+  max-width: none !important;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+}
+pagefind-modal-trigger .pf-trigger-text {
+  color: var(--text-muted) !important;
+}
+pagefind-modal-trigger .pf-trigger-icon {
+  opacity: 0.7 !important;
+}
+/* The shortcut is only a wrapper — it carries no fill or border of its own, so
+   the keys inside it read as keys rather than as a box within a box. */
+pagefind-modal-trigger .pf-trigger-shortcut {
+  margin-left: auto !important;
+  font-size: var(--text-xs)!important;
+  font-family: var(--font-mono) !important;
+  color: var(--text-dim) !important;
+}
+/* Each key sits one step lighter than the search pill it rests on, so it reads
+   as a raised keycap. Pagefind's default fill (--pf-hover) is the same grey as
+   the pill and vanishes against it. */
+pagefind-modal-trigger .pf-trigger-key {
+  background: var(--kbd-bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-dim) !important;
+  font-family: var(--font-mono) !important;
+}
+/* Combines with the response panel's status/variant/view filter. */
+.code-body.object-filtered-out { display: none; }
+.response-status-tab.object-filtered-out { display: none; }
+.response-variant-tab.object-filtered-out { display: none; }
+
+/* ---------- Code panel ---------- */
+/* No shadow: the fill and hairline bound the panel on their own. The old
+   0 20px 40px -20px rgba(0,0,0,.3) was tuned for a dark slab and reads as a
+   smudge under the cream one. */
+.code-panel {
+  background: var(--bg-code);
+  border: 1px solid var(--code-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 20px 0 32px;
+}
+.code-panel-head {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px 6px 12px;
+  background: var(--code-surface);
+  border-bottom: 1px solid var(--code-border);
+}
+.code-panel-tabs { display: flex; gap: 4px; }
+.code-panel-tab {
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  color: #8B857D;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.code-panel-tab:hover { color: #F5F0E8; }
+.code-panel-tab.active {
+  color: #F5F0E8;
+  background: #2A2724;
+}
+.code-panel-copy {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #8B857D;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.code-panel-copy:hover { color: #F5F0E8; background: #2A2724; }
+.code-panel-copy svg { width: 12px; height: 12px; }
+
+.code-panel pre {
+  margin: 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: #E5E4E0;
+}
+/* Response bodies scroll horizontally rather than wrap, so long values
+   (AI card JSON strings, URLs, long IDs) stay on one line and read the
+   same way as the request panels and the record-model example. */
+.code-panel-response .code-body pre {
+  white-space: pre;
+}
+.code-panel .code-body[hidden] { display: none; }
+
+.code-panel-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  background: var(--code-surface);
+  border-top: 1px solid var(--code-border);
+}
+.code-panel-foot[hidden] { display: none; }
+
+/* Token colors — hand-authored spans. This is the DARK set (light mode
+   overrides it below).
+   The two greys were #6B655D, which is only 3.14:1 on the #171614 slab — under
+   the 4.5:1 AA minimum, and they cover the property keys, i.e. half the text in
+   every JSON response. #8B857D clears it at 4.95:1 and is already the dark
+   theme's --text-muted, so it stays visibly dimmer than the values beside it
+   without being a new colour. */
+.tok-k { color: #C4B5FD; }              /* keyword / method   8.80:1 */
+.tok-s { color: #A6E1A6; }              /* string            12.01:1 */
+.tok-n { color: #F9C74F; }              /* number            11.46:1 */
+.tok-c { color: #8B857D; font-style: italic; }  /* comment    4.95:1 */
+.tok-p { color: #8B857D; }              /* property key       4.95:1 */
+.tok-b { color: #7ACFA1; }              /* boolean/null      10.9:1  */
+.tok-u { color: #E5E4E0; }              /* url part          14.21:1 */
+
+/* ---- Light mode: recolour the code panel for the cream surface ----
+   Everything above is authored against the dark slab (light text, glowing
+   dots, translucent fills). On the cream surface those read as "dark strip on
+   a light page", so the chrome flips to a warm neutral palette and the syntax
+   tokens to their dark-on-light equivalents. */
+:root[data-theme="light"] .code-panel pre { color: #1D1C1A; }
+:root[data-theme="light"] .code-panel-endpoint { color: #1D1C1A; }
+:root[data-theme="light"] .code-panel-tab { color: #6B655D; }
+:root[data-theme="light"] .code-panel-tab:hover { color: #1D1C1A; }
+:root[data-theme="light"] .code-panel-tab.active { color: #1D1C1A; background: #E5E1D9; }
+:root[data-theme="light"] .code-panel-copy { color: #6B655D; }
+:root[data-theme="light"] .code-panel-copy:hover { color: #1D1C1A; background: #E5E1D9; }
+:root[data-theme="light"] .response-status-tab { color: #6B655D; }
+:root[data-theme="light"] .response-status-tab:hover { color: #1D1C1A; }
+:root[data-theme="light"] .response-status-tab.active { color: #1D1C1A; background: #E5E1D9; }
+:root[data-theme="light"] .response-variant-tab,
+:root[data-theme="light"] .request-variant-tab { color: #6B655D; }
+:root[data-theme="light"] .response-variant-tab:hover,
+:root[data-theme="light"] .request-variant-tab:hover { color: #1D1C1A; }
+:root[data-theme="light"] .response-variant-tab.active,
+:root[data-theme="light"] .request-variant-tab.active { color: #1D1C1A; border-color: #C9C2B4; background: #E5E1D9; }
+:root[data-theme="light"] .show-schema-toggle { color: #6B655D; }
+:root[data-theme="light"] .show-schema-toggle:hover { color: #1D1C1A; }
+:root[data-theme="light"] .show-schema-toggle.active { color: #1D1C1A; background: #E5E1D9; }
+/* These two hardcode the dark inset (#14130F) rather than reading a token. */
+:root[data-theme="light"] .response-variant-bar,
+:root[data-theme="light"] .request-variant-bar { background: #EFEAE0; border-bottom-color: #E5E1D9; }
+:root[data-theme="light"] .response-caption { background: #EFEAE0; border-top-color: #E5E1D9; color: #6B655D; }
+
+/* Syntax tokens: the dark-slab set above is bright-on-black. On cream they need
+   the darker, desaturated equivalents or they vanish. */
+:root[data-theme="light"] .tok-k { color: #5B21B6; }              /* keyword / method — rust */
+:root[data-theme="light"] .tok-s { color: #2E7D32; }              /* string — dark green */
+:root[data-theme="light"] .tok-n { color: #A5680E; }              /* number — dark amber */
+:root[data-theme="light"] .tok-c { color: #7A756D; }              /* comment — muted */
+:root[data-theme="light"] .tok-p { color: #4A4640; }              /* property key — dark neutral */
+:root[data-theme="light"] .tok-b { color: #226E3F; }              /* boolean/null — dark green */
+:root[data-theme="light"] .tok-u { color: #3D3934; }              /* url part — dark neutral */
+
+/* ---------- Callouts ---------- */
+/* Same banner treatment as blockquote: brand-red rule on a soft red tint, and
+   no 1px outline — the tint is what bounds the box, so an outline on top of it
+   is a second, competing edge. Was --bg-panel + --border + --accent, which read
+   as a bordered card that happened to have a red edge. */
+.callout {
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
+  border-left: 3px solid var(--banner-rule);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
+  color: var(--text);
+  margin: 20px 0;
+  font-size: var(--text-ui);
+  line-height: 1.55;
+}
+/* Sentence case, semibold — same reasoning as the table headers. The title text
+   in the HTML is already written in sentence case ("Associations at create
+   time"); it was CSS doing the shouting. Dropping the transform also keeps real
+   acronyms intact, e.g. "PATCH vs PUT". Sized to the callout's body text so the
+   title leads by weight rather than by being a smaller, spaced-out label. */
+/* The last child's own bottom margin (16px from the global `p` rule) stacks on
+   top of the callout's 12px padding, so every banner sat lopsided — more space
+   below the text than above it. Zeroing only the LAST child keeps the 16px gap
+   *between* paragraphs in the multi-paragraph callouts intact. */
+.callout > :last-child { margin-bottom: 0; }
+
+/* Code chips on a banner. The generic `p code` rule gives them --bg-panel and
+   the neutral grey --border, which reads as a grey box dropped on a red tint.
+   Declared after that rule so it wins on equal specificity for `blockquote`. */
+.callout code,
+blockquote code {
+  background: var(--banner-chip-bg);
+  border-color: var(--banner-chip-border);
+}
+
+.callout-title {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+  font-size: var(--text-ui);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* ---------- Feedback / pager ---------- */
+/* Enclosed panel rather than a rule above and below. Shares the secondary
+   button's fill, so the pills inside invert to the page background to stay
+   legible — otherwise they'd be the same colour as the box they sit in. */
+.feedback {
+  /* The row must be exactly as tall after voting as before it. The buttons are
+     28px; the confirmation that replaces them is only ~22px of text, so without
+     this the panel shrank ~6px on click and snatched the pager up under the
+     reader's cursor. Both states claim this height, so the swap is silent.
+     It's a min, not a fixed height: the "no" copy is allowed to wrap and grow
+     the row on a narrow viewport. */
+  --feedback-control-h: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 64px;
+  padding: 16px 20px;
+  background: var(--btn-secondary-bg);
+  border-radius: 12px;
+  font-size: var(--text-ui);
+  color: var(--text-muted);
+}
+.feedback-btn {
+  /* Buttons don't inherit the page font by default — must be set explicitly. */
+  font-family: var(--font-display);
+  /* Flex so the thumb icon and label sit on a shared centre line rather than
+     the text baseline, which would leave the icon hanging low. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--feedback-control-h);
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  /* Page background, not --btn-secondary-bg: these sit ON the secondary fill
+     now, so they'd be invisible in it. Inverting keeps them reading as pills. */
+  background: var(--bg);
+  /* Transparent rather than removed, so the button keeps its current size. */
+  border: 1px solid transparent;
+  color: var(--text);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+/* 14px reads as a peer of the 13px label rather than an oversized glyph. The
+   thumbs-down is the same path mirrored, so it optically sits ~1px high —
+   nudge it back down so both icons share a centre line. */
+.feedback-btn svg { width: 14px; height: 14px; flex-shrink: 0; transition: color 0.15s ease; }
+.feedback-btn[data-vote="no"] svg { transform: translateY(1px); }
+/* Hover darkens past the box behind it, so the response is legible against the
+   panel rather than blending into it. */
+.feedback-btn:hover { background: var(--btn-secondary-bg-hover); }
+/* On hover the thumb takes the success/danger colour — the same green and red
+   the docs use for POST vs DELETE and OK vs error, so the signal is consistent.
+   Only the icon changes; the label stays --text so it never drops below
+   contrast. The SVGs are stroked with currentColor, so setting `color` suffices. */
+.feedback-btn[data-vote="yes"]:hover svg { color: var(--positive); }
+.feedback-btn[data-vote="no"]:hover svg { color: var(--negative); }
+
+/* Post-vote confirmation. Replaces the buttons inside the same panel, so the
+   row keeps its size and the page doesn't jump under the reader's cursor. */
+.feedback-done {
+  display: flex;
+  align-items: center;
+  /* Matches the buttons it replaces, so the row's height never changes. */
+  min-height: var(--feedback-control-h);
+  gap: 10px;
+  color: var(--text-muted);
+}
+.feedback-done svg { width: 16px; height: 16px; flex-shrink: 0; }
+.feedback-done strong { color: var(--text); font-weight: 600; }
+/* Green tick for a submitted "yes". The envelope on "no" is an offer of help,
+   not an error, so it takes the link colour rather than --negative. */
+.feedback-done .fb-icon-yes { color: var(--positive); }
+.feedback-done .fb-icon-no  { color: var(--accent); }
+
+/* Optional comment step, revealed after a vote. The row becomes a stacked form,
+   so it drops its centre-aligned single-line layout for a column that can grow. */
+.feedback.is-collecting {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.feedback-form { display: flex; flex-direction: column; gap: 10px; }
+.feedback-form-title {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--text-ui);
+}
+.feedback-optional {
+  margin-left: 4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  vertical-align: 1px;
+}
+/* Comment box + email share the drawer form treatment (bg-panel, bordered, accent
+   focus ring) so they read as the same family as the Test Request inputs. The
+   comment box uses the UI font, not mono — it's prose, not code. */
+.feedback-comment,
+.feedback-email {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+}
+.feedback-comment { line-height: 1.55; resize: vertical; min-height: 66px; }
+.feedback-comment:focus,
+.feedback-email:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.feedback-form-actions { display: flex; align-items: center; gap: 8px; }
+.feedback-submit,
+.feedback-skip {
+  font-family: var(--font-display);
+  min-height: var(--feedback-control-h);
+  padding: 5px 16px;
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.feedback-submit { background: var(--accent); color: #FFFFFF; }
+.feedback-submit:hover { background: var(--accent-hover); }
+.feedback-skip { background: transparent; color: var(--text-muted); }
+.feedback-skip:hover { color: var(--text); background: var(--btn-secondary-bg-hover); }
+/* Honeypot: kept in the DOM and submittable, but off-screen and out of the tab
+   order so no human sees or reaches it. A filled value flags a bot server-side. */
+.fb-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* No border-top: the line under the feedback row was this rule, and the boxed
+   feedback panel now does the separating. */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+.pager a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pager a strong {
+  color: var(--text);
+  font-size: var(--text-body);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+.pager a.pager-next { align-items: flex-end; }
+.pager a:hover strong { color: var(--accent); }
+.pager .spacer { flex: 1; }
+
+/* ---------- Tables ---------- */
+/* Enclosed table: border on all four sides, 12px radius.
+   border-collapse must be `separate` for the radius to render at all — with
+   `collapse`, browsers ignore border-radius on the table box. Cell borders are
+   therefore drawn per-cell (bottom only) to avoid doubling up. */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 20px 0;
+  font-size: var(--text-ui);
+  border: 1px solid var(--table-border);
+  border-radius: 12px;
+}
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  /* The lighter internal rule, not --table-border. Every horizontal line left
+     in the table is a separator BETWEEN body rows: `thead th` clears its own
+     border below (the beige fill is that boundary) and the last row's is
+     removed too, so the frame is the only thing still at full strength. */
+  border-bottom: 1px solid var(--table-rule);
+  vertical-align: top;
+}
+/* The table's own border draws the bottom edge — a cell border here would
+   double it and cut the rounded corners with a straight line. */
+tbody tr:last-child > th,
+tbody tr:last-child > td { border-bottom: 0; }
+
+/* Header cells read as headers through weight and full-strength colour, not
+   small-caps. Uppercase + letter-spacing + muted grey made them quieter than
+   the data they label; semibold at the body size reverses that. */
+th {
+  color: var(--text);
+  font-weight: 600;
+  font-size: var(--text-ui);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* --- Header fill -------------------------------------------------------
+   Two table shapes in these docs:
+     1. A <thead> header ROW (conventions, errors, records, …)
+     2. No thead — the first column carries the label (Concepts, Schema,
+        Users, Pipelines). That column is the de-facto header.
+   Both get the resource cards' beige. */
+/* Same reasoning as the header column: the fill is the boundary, so the header
+   row needs no rule under it. Overrides the border-bottom from `th, td` above. */
+thead th {
+  background: var(--card-bg);
+  border-bottom: 0;
+}
+
+/* :has() picks out the thead-less tables without needing a class on nine
+   pages of markup. If a browser lacks :has() support the column simply stays
+   unfilled — the table is still fully readable. */
+/* No border-right: the beige fill already marks the column as the header, so a
+   rule beside it is a second, redundant boundary. */
+table:not(:has(thead)) tbody > tr > td:first-child {
+  background: var(--card-bg);
+  /* Same treatment as a <th>: semibold, full-strength foreground. */
+  color: var(--text);
+  font-weight: 600;
+}
+/* Concepts marks its labels with <strong> (700). Pin them to 600 so a header
+   column reads identically whether the markup bolds it or not. */
+table:not(:has(thead)) tbody > tr > td:first-child strong { font-weight: 600; }
+
+/* Corner cells must round themselves: a filled cell has square corners of its
+   own, which would poke past the table's 12px radius. 11px = 12px minus the
+   1px border, so the fill sits flush inside the curve. Only the *filled* cells
+   need this — transparent ones have nothing to overflow. */
+thead > tr:first-child > th:first-child { border-top-left-radius: 11px; }
+thead > tr:first-child > th:last-child  { border-top-right-radius: 11px; }
+table:not(:has(thead)) tbody > tr:first-child > td:first-child { border-top-left-radius: 11px; }
+table:not(:has(thead)) tbody > tr:last-child  > td:first-child { border-bottom-left-radius: 11px; }
+
+/* ---------- Sticky "in this page" section for stub pages ---------- */
+.stub-hero {
+  padding: 96px 0;
+  text-align: center;
+}
+.stub-hero .badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Test Request drawer ---------- */
+.test-btn {
+  margin-left: 8px;
+  background: rgba(245, 240, 232, 0.06);
+  border: 1px solid #2A2724;
+  color: #F5F0E8;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.test-btn:hover { background: rgba(245, 240, 232, 0.12); border-color: #3D3934; }
+.test-btn::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 6px solid #F5F0E8;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+/* Light-mode: dark text + visible border + dark play triangle on the
+   warm cream code-panel-foot. Without these the button is unreadable. */
+/* .test-btn sits in the panel foot, which is cream on light — so it needs the
+   dark-on-light treatment too. */
+:root[data-theme="light"] .test-btn {
+  color: #1D1C1A;
+  border-color: #C9C2B4;
+  background: rgba(29, 28, 26, 0.03);
+}
+:root[data-theme="light"] .test-btn:hover {
+  background: rgba(29, 28, 26, 0.06);
+  border-color: #6B655D;
+}
+:root[data-theme="light"] .test-btn::before {
+  border-left-color: #1D1C1A;
+}
+
+.test-drawer {
+  position: fixed; inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: stretch; justify-content: center;
+  padding: 24px;
+  animation: dt-fade 0.15s ease;
+}
+:root[data-theme="light"] .test-drawer { background: rgba(0, 0, 0, 0.35); }
+.test-drawer[hidden] { display: none; }
+@keyframes dt-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.test-drawer-body {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 1200px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+}
+
+.test-drawer-topbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.close-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: var(--text-h3); line-height: 1;
+  flex-shrink: 0;
+}
+.close-btn:hover { color: var(--text); border-color: var(--border-hover); }
+
+.url-preview {
+  flex: 1;
+  display: flex; align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+/* Flex gap on .url-preview used to put 10px between EVERY child, which
+   put a visible space between the domain (.url-base) and the path
+   (.url-path). Instead, only space the method badge from the URL —
+   the URL parts read as one continuous string. */
+.url-preview .method-badge { margin-right: 10px; }
+/* One consistent color across the whole URL — no highlighting of
+   substituted variables or muted domain. Reads as one string. */
+.url-preview .url-base,
+.url-preview .url-path,
+.url-preview .url-var,
+.url-preview .url-query { color: var(--text); }
+
+.send-btn {
+  padding: 6px 16px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+:root[data-theme="light"] .send-btn { background: var(--text); color: #FFFFFF; }
+.send-btn:hover { background: var(--accent); color: #FFFFFF; }
+.send-btn::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 7px solid currentColor;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.test-drawer-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+.test-drawer-left, .test-drawer-right {
+  overflow-y: auto;
+  min-height: 0;
+}
+.test-drawer-left { border-right: 1px solid var(--border); }
+
+.drawer-section-title {
+  padding: 10px 16px 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.drawer-section-title::before {
+  content: '▾';
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  margin-right: 8px;
+  transition: transform 0.15s ease;
+}
+.drawer-section-title.collapsed::before { transform: rotate(-90deg); }
+.drawer-section-title .required-note {
+  margin-left: 6px;
+  color: var(--accent);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.drawer-section-title .meta {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  font-family: var(--font-mono);
+}
+
+.drawer-section-body { padding: 8px 16px 16px; }
+.drawer-section-title.collapsed + .drawer-section-body { display: none; }
+
+.kv-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 180px) 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+.kv-row .kv-name {
+  color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kv-row .kv-name .req { color: var(--accent); font-size: var(--text-xs); }
+.kv-row .kv-name .kv-type { color: var(--text-muted); font-size: var(--text-xs); }
+.kv-row input {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  min-width: 0;
+  width: 100%;
+}
+.kv-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.kv-empty {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+/* Token field + its reveal toggle. Masked by default (credential hygiene on
+   screen-shares), so the eye button sits inside the input's trailing edge. */
+.auth-input-wrap { position: relative; display: block; min-width: 0; }
+.auth-input-wrap input { padding-right: 34px; }
+.auth-reveal {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.auth-reveal svg { width: 15px; height: 15px; }
+.auth-reveal:hover { color: var(--text); }
+.auth-reveal.is-shown { color: var(--accent); }
+
+/* "Saved for this tab · Forget" — shown only while a token is remembered. */
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.auth-remember-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #35B37E;
+  flex: none;
+}
+.auth-forget {
+  margin-left: 2px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.auth-forget:hover { color: var(--accent-hover); }
+
+.body-editor {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  width: 100%;
+  min-height: 160px;
+  resize: vertical;
+}
+.body-editor:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.response-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.response-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.response-status.ok { background: rgba(87, 187, 138, 0.15); color: #7ACFA1; }
+.response-status.err { background: rgba(228, 93, 74, 0.15); color: #A78BFA; }
+:root[data-theme="light"] .response-status.ok { background: rgba(46, 160, 84, 0.10); color: #226E3F; }
+:root[data-theme="light"] .response-status.err { background: rgba(190, 40, 20, 0.10); color: #8B2211; }
+.response-time {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+
+.response-body {
+  margin: 0;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+  min-height: 200px;
+}
+.response-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+.response-error-hint {
+  padding: 12px 16px;
+  margin: 12px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .test-drawer-cols { grid-template-columns: 1fr; }
+  .test-drawer-left { border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
+/* ---------- Responsive final ---------- */
+/* ---------- Mobile nav (<=900px) ---------- */
+/* Desktop: the hamburger, the topbar wordmark and the compact search icon are
+   all mobile-only chrome. */
+.nav-toggle,
+.topbar-brand,
+.search-compact { display: none; }
+.nav-backdrop { display: none; }
+
+@media (max-width: 900px) {
+  /* Single column: the sidebar leaves the grid and becomes an overlay drawer,
+     so it must not reserve a track. */
+  .shell { grid-template-columns: 1fr; }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    background: transparent;
+    border: none;
+    padding: 7px;
+    margin-left: -4px;
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .nav-toggle:hover { background: var(--bg-hover); }
+  .nav-toggle svg { width: 20px; height: 20px; }
+  /* One button, two glyphs — swap on state rather than rebuilding the icon. */
+  .nav-toggle .nav-icon-close { display: none; }
+  .nav-toggle[aria-expanded="true"] .nav-icon-open { display: none; }
+  .nav-toggle[aria-expanded="true"] .nav-icon-close { display: block; }
+
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+  .topbar-brand img { height: 18px; width: auto; }
+
+  /* The full pill would crowd out the logo; the icon takes its place, pushed to
+     the trailing edge so it sits just before the theme toggle. */
+  .search-full { display: none; }
+  .search-compact {
+    display: inline-flex;
+    margin-left: auto;
+    flex: none;
+  }
+
+  /* Tighter than the desktop 24px — four items have to fit a phone's width. */
+  .topbar { gap: 12px; padding: 12px 20px; }
+  /* The toggle carries margin-left:auto on desktop to hold the right edge. Here
+     .search-compact already does that job, and TWO auto margins split the free
+     space between them — which is what was opening a huge gap between the two
+     icons. Drop it so the only spacing left is the topbar's 12px gap.
+     flex: none so the toggle can never be shrunk out of view by a neighbour. */
+  .topbar .icon-btn {
+    margin-left: 0;
+    flex: none;
+  }
+
+  /* The drawer itself. Was `display: none`, i.e. mobile had NO navigation at
+     all. Fixed + translated off-canvas, above the sticky topbar (z-index 20). */
+  .sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 288px;
+    max-width: 82vw;
+    height: 100dvh;
+    z-index: 40;
+    overflow-y: auto;
+    background: var(--bg);
+    border-right: 1px solid var(--border-chrome);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .nav-backdrop[hidden] { display: none; }
+
+  /* Stop the page behind the drawer from scrolling under the reader's finger. */
+  body.nav-open { overflow: hidden; }
+}
+
+/* The drawer slide is decorative — snap it for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none; }
+}
+
+/* ---------- Site footer ---------- */
+/* Sits below .content inside .main, so it spans the main column and clears the
+   sidebar. `margin-top: auto` pins it to the bottom of the viewport on short
+   pages (.main is a flex column) instead of floating mid-screen. */
+/* Grid, not flex: the two 1fr side tracks are always equal, so the middle track
+   is centred against the footer itself. With flex, the copyright sat wherever
+   the logo's width left it and only looked centred by coincidence. */
+.site-footer {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 64px;
+  border-top: 1px solid var(--border-chrome);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+/* inline-flex so the <a> hugs the wordmark instead of inheriting the line-box's
+   extra descender space, which would knock it off the copyright's centre line. */
+/* justify-self: start — a grid item stretches to fill its track by default,
+   which would make the whole left third of the footer a click target. */
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+}
+/* 16px vs the sidebar's 30px — the footer is a quiet sign-off, not a masthead.
+   Auto width keeps the ~7:1 wordmark from being squashed. */
+.site-footer-brand img {
+  height: 16px;
+  width: auto;
+}
+.site-footer-brand:hover { opacity: 0.7; }
+.site-footer-copy {
+  color: var(--text-muted);
+  text-align: center;
+}
+/* justify-self replaces the old margin-left: auto — the grid track already ends
+   at the footer's trailing edge, so the links only need pinning within it. */
+.site-footer-links {
+  justify-self: end;
+  display: flex;
+  gap: 20px;
+}
+.site-footer-links a { color: var(--text-muted); }
+.site-footer-links a:hover { color: var(--text); }
+
+/* Stack on narrow screens: the row would otherwise wrap the links awkwardly
+   under the copyright while keeping them right-aligned. */
+/* Stack on narrow screens — three columns can't hold the copyright on one line,
+   and centring it in a squeezed middle track just reads as broken. */
+@media (max-width: 720px) {
+  .site-footer {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    padding: 20px;
+    gap: 12px;
+  }
+  .site-footer-copy { text-align: left; }
+  .site-footer-links { justify-self: start; }
+}
+
+/* ============================================================
+   Copy-link anchor on endpoint headings
+   A chain-link button that app.js (__initAnchorLinks) appends inside each
+   endpoint <h2>. Hidden until the heading is hovered or the button is focused;
+   clicking copies a deep link and the tooltip flips "Copy link" → "Copied!".
+   ============================================================ */
+.anchor-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.4em;
+  padding: 0;
+  vertical-align: middle;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);        /* always shown, but a quiet grey next to the heading */
+  cursor: pointer;
+  position: relative;
+  transition: background-color 120ms ease, color 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.anchor-copy svg { width: 1rem; height: 1rem; display: block; }
+
+/* The icon is a persistent permalink affordance — always visible. Hover, keyboard
+   focus, and the "Copied!" state only add emphasis: a darker glyph on a soft chip. */
+.anchor-copy:hover,
+.anchor-copy:focus-visible,
+.anchor-copy.is-copied {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.anchor-copy:focus-visible {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 2px;
+}
+
+/* Tooltip bubble. Using --text as background and --bg as text inverts it per
+   theme for free: a near-black bubble on light, a near-white bubble on dark. */
+.anchor-copy::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.32rem 0.5rem;
+  border-radius: 7px;
+  background: var(--text);
+  color: var(--bg);
+  font: 600 0.72rem/1 var(--font-sans);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  z-index: 20;
+}
+/* Tooltip tail. */
+.anchor-copy::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 20;
+}
+.anchor-copy:hover::after,
+.anchor-copy:hover::before,
+.anchor-copy:focus-visible::after,
+.anchor-copy:focus-visible::before,
+.anchor-copy.is-copied::after,
+.anchor-copy.is-copied::before { opacity: 1; }

@@ -1,0 +1,43 @@
+/* "Book a demo" popup (Nav component > Demo popup, a native Webflow Modal opened by the navbar's Schedule a demo
+   buttons). From Figma node 1443:5076. Layout, type and colours are Webflow classes (demo-popup_*); this file holds
+   what Webflow can't express: the rotated ribbon, the two blurred white fades over it, the field's focus ring and the
+   page behind. Loaded on every page by site/forms.js. */
+
+/* the ribbon: Figma's image, rotated -50.53deg and flipped, anchored to the popup's top-right so it stays put on
+   narrow screens. (16 Nov: placed by eye against the Figma render; the frame's own numbers put the band outside the
+   popup, with only a corner showing) */
+.demo-popup_ribbon {
+  left: calc(100% - 225px); top: 400px; translate: -50% -50%;
+  transform: rotate(-50.53deg) scaleY(-1);
+  background: url(/external/dreamteam-webflow-assets.rehankhurshid1.workers.dev/site/demo-popup/ribbon.webp)
+    -180px -82px / 136.11% 136.11% no-repeat;
+}
+/* the fades: white from the top (206px) and from 144px down to the bottom, each blurring what's under it */
+.demo-popup_bg::before, .demo-popup_bg::after {
+  content: ""; position: absolute; left: 0; right: 0;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.demo-popup_bg::before { top: 0; height: 206px; background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+  border-radius: 0 0 24px 24px; }
+.demo-popup_bg::after { top: 144px; bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 80.86%);
+  border-radius: 0 0 24px 24px; }
+
+/* the field: black edge and a soft grey ring while typing */
+.demo-popup_form .home-hero_form-field { transition: box-shadow 200ms ease; }
+.demo-popup_form .home-hero_form-field:focus-within { box-shadow: 0 0 0 2px #000, 0 0 0 10px rgba(0,0,0,.1), 0 2px 16px rgba(0,0,0,.08); }
+.demo-popup_form .contact-options_form-note { text-align: center; }
+
+.demo-popup_close { transition: background-color 200ms ease; }
+.demo-popup_close:hover { background-color: rgba(0,0,0,.06); }
+.demo-popup_close:focus-visible { outline: 2px solid #1c1d1f; outline-offset: 2px; }
+
+/* the page behind: a light blur */
+.demo-popup_component::backdrop { background: rgba(255,255,255,.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+@media screen and (max-width: 479px) {
+  .demo-popup_content { padding: 2rem 1.25rem 1rem; min-height: 26rem; }
+  /* 16 Nov: the card sits near the top, so the email box stays above the phone keyboard */
+  .demo-popup_component { margin-top: max(1rem, env(safe-area-inset-top)); margin-bottom: auto; }
+  .demo-popup_heading { font-size: 2rem; }
+  .demo-popup_text { font-size: 1rem; line-height: 1.5rem; padding-right: 2.5rem; }
+}

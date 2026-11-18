@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Meetings &amp; transcripts - Dreamteam CRM API</title>
+  <meta name="description" content="A recipe that chains the reference endpoints to answer any question about a contact&#39;s meetings, their AI summaries, sentiment, and call transcripts." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html">Authentication</a>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html">Schema</a>
+          </li>
+          <li>
+            <a href="/api/records.html">Records</a>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html">Users</a>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html" class="active">Meetings & transcripts</a>
+            <ul class="nav-sublist">
+              <li><a href="#list-meetings">1 · List meetings</a></li>
+              <li><a href="#read-meeting">2 · Read the meeting</a></li>
+              <li><a href="#recording">3 · Recording & transcript</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content section" data-pagefind-body>
+                <p class="eyebrow">Recipes</p>
+        <h1>Meetings, transcripts &amp; summaries</h1>
+        <p class="lede">One recipe answers a whole family of questions - <em>“what meetings has this contact had?”</em>, <em>“what was the sentiment?”</em>, <em>“where’s the summary?”</em>, <em>“give me the transcript.”</em> They’re all reads: start from a contact, follow the association to the meeting, read the meeting’s AI summary, highlights and sentiment - then hop one more link to the recording for the transcript itself and the media. The same pattern works from a <strong>company</strong> or <strong>deal</strong> - pass <code>?associations=meeting</code> on any of them.</p>
+
+        <div class="callout">
+          <p class="callout-title">Before you start</p>
+          <p>Two things carry through every step. These are all <strong>reads</strong> - meetings and recordings are ingested by the call integrations (Recall.ai, Fathom, Clari…), so there’s no create endpoint, and their AI fields fill in <strong>asynchronously</strong> (wait for the recording’s <code>status_code: "TRANSCRIPT_DONE"</code>). And like <code>ai_about</code>, the AI fields - and the raw <code>transcript</code> - come back as <strong>JSON-encoded strings</strong> to parse; <code>ai_formatted_transcript</code> is already an object.</p>
+        </div>
+
+        <!-- ============ Step 1 ============ -->
+        <section class="endpoint" id="list-meetings">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Step 1 · List the meetings on a contact</h2>
+              <p>Retrieve the contact and embed its meetings by passing <code>?associations=meeting</code>. Embedded associations come back as <code>{id, association_name}</code> pairs - ids only.</p>
+              <p class="muted">Take a meeting <code>id</code> from <code>associations.meeting.records</code> into Step 2. Got several? Fetch them all in one call with <a href="/api/find-records.html#batch-fetch">Hydrate by IDs</a> (<code>object=meeting</code>). More than 100 meetings on one record are paged with the <a href="/api/records.html#retrieve-a-record">dedicated associations endpoint</a>.</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/contact/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/contact/records/1015634?associations=meeting'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1015634</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"contact"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"first_name"</span>: <span class="tok-s">"Ada"</span>,
+    <span class="tok-p">"last_name"</span>: <span class="tok-s">"Chen"</span>,
+    <span class="tok-p">"email"</span>: <span class="tok-s">"ada@example.com"</span>,
+    <span class="tok-p">"owner_id"</span>: <span class="tok-n">1000052</span>
+  },
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"meeting"</span>: {
+      <span class="tok-p">"records"</span>: [
+        { <span class="tok-p">"id"</span>: <span class="tok-n">1090142</span>, <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_meeting_assoc"</span> },
+        { <span class="tok-p">"id"</span>: <span class="tok-n">1090143</span>, <span class="tok-p">"association_name"</span>: <span class="tok-s">"contact_meeting_assoc"</span> }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">2</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-08-10T09:57:24.713Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-08-28T22:21:16.889Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="200">The contact, with its meeting ids embedded</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Step 2 ============ -->
+        <section class="endpoint" id="read-meeting">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Step 2 · Read the meeting - summary, highlights, sentiment</h2>
+              <p>Retrieve the meeting by an id from Step 1. It carries the meeting intelligence: <code>ai_sentiment</code> (<code>Good</code> / <code>Neutral</code> / <code>Bad</code>) as a plain value, and <code>ai_meeting_summary</code>, <code>ai_meeting_highlights</code>, <code>ai_meeting_post_brief</code> as <strong>JSON-encoded strings</strong> - parse each after reading. <code>participants</code> is a comma-separated list of attendee emails.</p>
+              <p class="muted">The meeting does <strong>not</strong> hold the transcript - that lives on the recording. Continue to Step 3 for the transcript and media.</p>
+            </div>
+            <div class="code-col">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/meeting/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/meeting/records/1090142'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1090142</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"meeting"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"title"</span>: <span class="tok-s">"Analytical Engines - Q3 renewal call"</span>,
+    <span class="tok-p">"start_at"</span>: <span class="tok-s">"2026-08-14T15:00:00Z"</span>,
+    <span class="tok-p">"end_at"</span>: <span class="tok-s">"2026-08-14T15:30:00Z"</span>,
+    <span class="tok-p">"external"</span>: <span class="tok-b">true</span>,
+    <span class="tok-p">"user_id"</span>: <span class="tok-n">1000052</span>,
+    <span class="tok-p">"participants"</span>: <span class="tok-s">"sam@example.com, ada@example.com"</span>,
+    <span class="tok-p">"ai_sentiment"</span>: <span class="tok-s">"Good"</span>,
+    <span class="tok-p">"ai_meeting_summary"</span>: <span class="tok-s">"{\"meeting_type\":\"Check-in\",\"tags\":[{\"tag_type\":\"topic\",\"value\":\"Renewal\",\"render_type\":\"badge\"}],\"content\":[{\"title\":\"Summary\",\"icon_category\":\"lucide-file-text\",\"value\":\"Ada walked through the Q3 renewal timeline and two open blockers; agreed to follow up on pricing.\"}]}"</span>,
+    <span class="tok-p">"ai_meeting_highlights"</span>: <span class="tok-s">"[{\"heading\":\"Renewal timeline\",\"highlight_callout\":\"Ada confirmed a Q3 renewal target.\",\"highlight_details\":\"...\",\"timestamp\":\"06:14\"}]"</span>,
+    <span class="tok-p">"ai_meeting_post_brief"</span>: <span class="tok-s">"Sam walked Ada through the Q3 renewal plan and agreed to reconnect Monday after sharing pricing."</span>
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-08-14T15:31:02.221Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-08-14T15:48:10.984Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="200">The meeting, with AI summary, highlights, and sentiment (AI fields are JSON strings)</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Step 3 ============ -->
+        <section class="endpoint" id="recording">
+          <div class="endpoint-grid">
+            <div class="prose-col">
+              <h2 style="margin-top:0;">Step 3 · Follow the recording for the transcript</h2>
+              <p>The transcript and media live on the <strong>recording</strong>, one link on from the meeting. It’s two calls - <strong>use the tabs</strong> to switch between them: first read the meeting’s <code>recording</code> association for the id, then retrieve the recording.</p>
+              <p>The recording gives you two transcript shapes: <code>transcript</code> (the raw provider transcript, a <strong>JSON-encoded string</strong> of <code>segments</code>) and <code>ai_formatted_transcript</code> (a cleaned <strong>object</strong> of speaker turns with timestamps). <code>audio_url</code> and <code>video_url</code> are <strong>time-limited signed URLs</strong> - fetch them promptly and don’t store the URL itself.</p>
+              <p class="muted">Wait for <code>status_code: "TRANSCRIPT_DONE"</code> before relying on the transcript fields.</p>
+            </div>
+            <div class="code-col">
+              <div class="recipe-step-tabs" aria-label="Two calls: get the recording id, then read the recording">
+                <span class="code-object-tabs-label">2 calls</span>
+                <button class="recipe-step-tab active" data-step-view="get-id">1 · Get the recording id</button>
+                <button class="recipe-step-tab" data-step-view="read">2 · Read the recording</button>
+              </div>
+              <div class="recipe-step-view" data-step-view="get-id">
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/meeting/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-c"># meeting → recording id</span>
+<span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/meeting/records/1090142?associations=recording'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1090142</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"meeting"</span>,
+  <span class="tok-p">"associations"</span>: {
+    <span class="tok-p">"recording"</span>: {
+      <span class="tok-p">"records"</span>: [
+        {
+          <span class="tok-p">"id"</span>: <span class="tok-n">1090777</span>,
+          <span class="tok-p">"association_name"</span>: <span class="tok-s">"meeting_recording_assoc"</span>
+        }
+      ],
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"total"</span>: <span class="tok-n">1</span>,
+        <span class="tok-p">"has_more"</span>: <span class="tok-b">false</span>
+      }
+    }
+  }
+}</code></pre></div>
+                <div class="response-caption" data-status="200">The meeting’s recording id (the meeting’s properties are also returned, omitted here)</div>
+              </div>
+              </div>
+              <div class="recipe-step-view" data-step-view="read" hidden>
+              <div class="code-panel code-panel-request">
+                <div class="code-panel-head">
+                  <span class="code-panel-endpoint">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="code-panel-endpoint-path">/api/v1/objects/recording/records/{id}</span>
+                  </span>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body"><pre><code><span class="tok-c"># read the recording</span>
+<span class="tok-k">curl</span> <span class="tok-s">'https://api.dreamteamcrm.ai/api/v1/objects/recording/records/1090777'</span> \
+  -H <span class="tok-s">'Authorization: Bearer &lt;YOUR_TOKEN&gt;'</span></code></pre></div>
+              </div>
+              <div class="code-panel code-panel-response" data-pagefind-ignore>
+                <div class="code-panel-head">
+                  <div class="response-status-tabs">
+                    <button class="response-status-tab active" data-status="200"><span class="dot dot-ok"></span>200 OK</button>
+                  </div>
+                  <button class="code-panel-copy" title="Copy"><span class="copy-label">Copy</span></button>
+                </div>
+                <div class="code-body" data-status="200" data-variant="default" data-view="example"><pre><code>{
+  <span class="tok-p">"id"</span>: <span class="tok-n">1090777</span>,
+  <span class="tok-p">"type"</span>: <span class="tok-s">"recording"</span>,
+  <span class="tok-p">"properties"</span>: {
+    <span class="tok-p">"provider_name"</span>: <span class="tok-s">"recall"</span>,
+    <span class="tok-p">"status"</span>: <span class="tok-s">"completed"</span>,
+    <span class="tok-p">"status_code"</span>: <span class="tok-s">"TRANSCRIPT_DONE"</span>,
+    <span class="tok-p">"duration_seconds"</span>: <span class="tok-n">1842</span>,
+    <span class="tok-p">"recording_started_at"</span>: <span class="tok-s">"2026-08-14T15:00:12Z"</span>,
+    <span class="tok-p">"recording_completed_at"</span>: <span class="tok-s">"2026-08-14T15:30:54Z"</span>,
+    <span class="tok-p">"audio_url"</span>: <span class="tok-s">"https://recordings.dreamteamcrm.ai/1090777/audio.mp3?X-Amz-Signature=..."</span>,
+    <span class="tok-p">"video_url"</span>: <span class="tok-s">"https://recordings.dreamteamcrm.ai/1090777/video.mp4?X-Amz-Signature=..."</span>,
+    <span class="tok-p">"audio_file"</span>: <span class="tok-n">1090780</span>,
+    <span class="tok-p">"video_file"</span>: <span class="tok-n">1090781</span>,
+    <span class="tok-p">"transcript"</span>: <span class="tok-s">"{\"version\":\"1.0\",\"provider\":\"recall\",\"duration_seconds\":1842.0,\"participants\":[{\"id\":\"100\",\"name\":\"Sam\",\"is_host\":true},{\"id\":\"300\",\"name\":\"Ada\",\"is_host\":false}],\"segments\":[{\"speaker_id\":\"100\",\"speaker_name\":\"Sam\",\"start_time\":13.9,\"end_time\":15.3,\"text\":\"Hi Ada, thanks for hopping on.\"}]}"</span>,
+    <span class="tok-p">"ai_formatted_transcript"</span>: {
+      <span class="tok-p">"metadata"</span>: {
+        <span class="tok-p">"hasTimestamps"</span>: <span class="tok-b">true</span>,
+        <span class="tok-p">"hasSpeakers"</span>: <span class="tok-b">true</span>,
+        <span class="tok-p">"totalSegments"</span>: <span class="tok-n">315</span>,
+        <span class="tok-p">"segmentationType"</span>: <span class="tok-s">"speaker_turns"</span>,
+        <span class="tok-p">"participants"</span>: [<span class="tok-s">"Sam"</span>, <span class="tok-s">"Ada"</span>]
+      },
+      <span class="tok-p">"segments"</span>: [
+        {
+          <span class="tok-p">"speaker"</span>: <span class="tok-s">"Sam"</span>,
+          <span class="tok-p">"text"</span>: <span class="tok-s">"Hi Ada, thanks for hopping on."</span>,
+          <span class="tok-p">"timestamp"</span>: <span class="tok-s">"0:13"</span>,
+          <span class="tok-p">"timestampSeconds"</span>: <span class="tok-n">13.949221</span>
+        }
+      ]
+    }
+  },
+  <span class="tok-p">"created_at"</span>: <span class="tok-s">"2026-08-14T15:31:04.915Z"</span>,
+  <span class="tok-p">"updated_at"</span>: <span class="tok-s">"2026-08-14T15:35:04.159Z"</span>,
+  <span class="tok-p">"created_by"</span>: <span class="tok-n">1000052</span>
+}</code></pre></div>
+                <div class="response-caption" data-status="200">The recording: raw transcript (string), ai_formatted_transcript (object), and media</div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="callout">
+          <p class="callout-title">See also</p>
+          <p><a href="/api/records.html#retrieve-a-record">Retrieve a record</a> and <a href="/api/find-records.html#batch-fetch">Hydrate by IDs</a> are the endpoints this recipe composes - use them directly to test each call live. To discover every field on <code>meeting</code> or <code>recording</code> yourself, call <a href="/api/schema.html">Describe Object</a>.</p>
+        </div>
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/recipes" data-fb-title="Meetings &amp; transcripts">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/pipelines.html">
+            Previous
+            <strong>← Pipelines</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>

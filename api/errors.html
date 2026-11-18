@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="archive-index" content="exclude" />
+  <title>Errors - Dreamteam CRM API</title>
+  <meta name="description" content="HTTP status codes the API returns, what each one means, and how to troubleshoot the most common one - 401 Unauthorized." />
+  <link rel="alternate" type="text/markdown" href="/api/dreamteam-api-docs.md" title="Dreamteam CRM API (Markdown for AI tools)" />
+  <!-- Favicon: swap by browser color scheme so the mark stays visible in both
+       light and dark browser chrome. Without these lines the browser
+       auto-requests /favicon.ico on every load, returns 403 on S3, and fills
+       the console. The `alternate icon` data: URL silences any browser that
+       still falls back to /favicon.ico. -->
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/api/assets/dreamteam-monogram-white.png" media="(prefers-color-scheme: dark)" />
+  <link rel="alternate icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="/external/fonts.googleapis.com/font_0c6ec1a12c79.css" rel="stylesheet" />
+  <!-- Preload the two Telegraf cuts used above the fold: Semibold for the h1,
+       Medium for the secondary CTA. A swap-in after first paint is very visible
+       on both. Regular (feedback buttons, below the fold) is left to load
+       normally. crossorigin is required on font preloads even same-origin, or
+       the browser fetches the file twice. -->
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Semibold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/api/assets/fonts/PPTelegraf-Medium.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Geist Mono renders every code block. One variable file covers all weights,
+       so this single preload primes the whole code surface. -->
+  <link rel="preload" href="/api/assets/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/api/assets/styles.css?v=1794830301" />
+  <link rel="stylesheet" href="/api/pagefind/pagefind-component-ui.css" />
+  <script type="module" src="/api/pagefind/pagefind-component-ui.js"></script>
+  
+  <script src="/api/assets/app.js?v=1794830301" defer></script>
+</head>
+<body>
+  <div class="shell">
+    
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="/api/">
+        <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam CRM API" />
+        <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam CRM API" />
+      </a>
+      <div class="nav-group">
+        <div class="nav-group-title">Guides</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/">Introduction</a>
+          </li>
+          <li>
+            <a href="/api/authentication.html">Authentication</a>
+          </li>
+          <li>
+            <a href="/api/conventions.html">Conventions</a>
+          </li>
+          <li>
+            <a href="/api/pagination.html">Pagination & Sorting</a>
+          </li>
+          <li>
+            <a href="/api/errors.html" class="active">Errors</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Resources</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/schema.html">Schema</a>
+          </li>
+          <li>
+            <a href="/api/records.html">Records</a>
+          </li>
+          <li>
+            <a href="/api/find-records.html">Find Records</a>
+          </li>
+          <li>
+            <a href="/api/tasks.html">Tasks</a>
+          </li>
+          <li>
+            <a href="/api/custom-objects.html">Custom objects</a>
+          </li>
+          <li>
+            <a href="/api/users.html">Users</a>
+          </li>
+          <li>
+            <a href="/api/pipelines.html">Pipelines</a>
+          </li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Recipes</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/api/recipes.html">Meetings & transcripts</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar">
+          <svg class="nav-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="nav-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a class="topbar-brand" href="/api/" aria-label="Dreamteam CRM API home">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+
+        
+        <pagefind-modal-trigger class="search-full" placeholder="Search"></pagefind-modal-trigger>
+        <pagefind-modal-trigger class="search-compact" compact hide-shortcut></pagefind-modal-trigger>
+        
+        <button class="icon-btn" aria-label="Toggle theme" onclick="__toggleTheme()">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <main class="content narrow" data-pagefind-body>
+        <p class="eyebrow">Guides</p>
+<h1>Errors</h1>
+<p class="lede">HTTP status codes the API returns, what each one means, and how to troubleshoot the most common one - 401 Unauthorized.</p>
+
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2xx</code></td>
+<td>Success</td>
+</tr>
+<tr>
+<td><code>400</code></td>
+<td>Bad request - the request failed validation (a missing required field, an invalid or duplicate value, or a malformed body)</td>
+</tr>
+<tr>
+<td><code>401</code></td>
+<td>Unauthorized - invalid or missing Bearer token</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>Forbidden - you don't have access to this record (for example a task that belongs to someone else)</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td>Not found - no record with that id, or an unknown object type in the URL</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td>Conflict - the request clashes with the record's current state (for example deleting a company that still has deals attached)</td>
+</tr>
+<tr>
+<td><code>415</code></td>
+<td>Unsupported media type - the request's <code>Content-Type</code> isn't accepted (for example a <code>PATCH</code> sent without <code>application/merge-patch+json</code>)</td>
+</tr>
+<tr>
+<td><code>500</code></td>
+<td>Server error</td>
+</tr>
+</tbody>
+</table>
+<p>If you see a <code>401</code>, first double-check the token - a typo or the wrong environment's token is the most common cause. Generate a new token from your profile page only if you suspect the token has been leaked or you need to rotate it as part of a security review.</p>
+
+<h3>401 response body</h3>
+<pre><code>{
+  "message": "Unauthorized access",
+  "path": "/api/v1/objects/contact/records",
+  "timestamp": "2026-07-02T08:26:39.437256781"
+}</code></pre>
+
+<h3>Error response shape</h3>
+<p>Most errors return a JSON body of this shape:</p>
+<pre><code>{
+  "code": "VALIDATION_FAILED",
+  "message": "Field 'email' is required",
+  "errors": [ ... ],
+  "path": "/api/v1/objects/contact/records",
+  "timestamp": "2026-07-02T08:48:05.199294005"
+}</code></pre>
+<p>The <code>code</code> at the top tells you what kind of error it is: <code>VALIDATION_FAILED</code> on a <code>400</code>, <code>NOT_FOUND</code> on a <code>404</code>, <code>CONFLICT</code> on a <code>409</code>. The <code>errors</code> list names the individual fields that were wrong, which the next section covers. It is always there, but it is empty when the problem is not about particular fields. Sign-in and access errors are shorter and carry <strong>no <code>code</code></strong>: a <code>401</code> says <code>"message": "Unauthorized access"</code> and a <code>403</code> says <code>"message": "Access denied"</code>, each with just <code>path</code> and <code>timestamp</code>.</p>
+
+<h3>Validation errors (400)</h3>
+<p>A <code>400</code> comes in two kinds. The common one is a problem with a field you sent: the <code>code</code> is <code>VALIDATION_FAILED</code>, and each entry in the <code>errors</code> list carries its own code saying what went wrong.</p>
+<table>
+<thead>
+<tr><th>Sub-code</th><th>Cause</th><th>Example message</th></tr>
+</thead>
+<tbody>
+<tr><td><code>REQUIRED_FIELD_MISSING</code></td><td>A required field was not included in the request</td><td><em>Field 'email' is required</em></td></tr>
+<tr><td><code>DUPLICATE_VALUE</code></td><td>A unique field already has this value on another record</td><td><em>Field 'email' must be unique. Value 'ada@example.com' already exists (conflicting record ID: 1012888).</em></td></tr>
+<tr><td><code>INVALID_FIELD</code></td><td>A field was given a value it doesn't accept</td><td><em>Field 'stage_id' is invalid.</em></td></tr>
+<tr><td><code>UNKNOWN_FIELD</code></td><td>The payload named a field that isn't on the object's schema</td><td><em>Unknown field 'emial'</em></td></tr>
+<tr><td><code>MAX_LENGTH_EXCEEDED</code></td><td>A value is longer than the maximum configured for that field</td><td><em>Field 'name' exceeds its maximum length</em></td></tr>
+<tr><td><code>INVALID_SORT_FIELD</code></td><td>The <code>sort</code> parameter named a field that can't be sorted on (list and find)</td><td><em>Cannot sort by 'foo'</em></td></tr>
+</tbody>
+</table>
+<p>The other kind is a request Dreamteam could not read at all: a body that is not valid JSON, a query parameter of the wrong type, or a required parameter you left off. These also return <code>400</code>, but the <code>code</code> is <code>COMMON-1000</code>, the <code>message</code> is a short note about what could not be read, and there is no <code>errors</code> list.</p>
+<p class="muted">Use the <a href="/api/schema.html">Schema</a> endpoint to check <code>required</code>, <code>unique</code>, and allowed values before writing.</p>
+
+<h3>404 causes</h3>
+<p><code>NOT_FOUND</code> can mean either the record id doesn't exist for that object type, or the object type in the URL is invalid (e.g. <code>contacts</code> plural instead of <code>contact</code>). Double-check that object types are <strong>singular</strong> and that the id exists.</p>
+
+
+        
+        <div class="feedback" data-support="gethelp@dreamteam.ai" data-fb-endpoint="" data-fb-page="/errors" data-fb-title="Errors">
+          <span>Was this page helpful?</span>
+          <button class="feedback-btn" data-vote="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Yes</span></button>
+          <button class="feedback-btn" data-vote="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg><span>No</span></button>
+        </div>
+
+        
+        <div class="pager">
+          
+          <a class="pager-prev" href="/api/pagination.html">
+            Previous
+            <strong>← Pagination & Sorting</strong>
+          </a>
+          
+          <span class="spacer"></span>
+          
+        </div>
+        
+      </main>
+
+      
+      <footer class="site-footer">
+        
+        <a class="site-footer-brand" href="https://dreamteam.ai/" title="Visit the Dreamteam website">
+          <img class="brand-logo-dark" src="/api/assets/dreamteam-logomark-black.png" alt="Dreamteam" />
+          <img class="brand-logo-light" src="/api/assets/dreamteam-logomark-white.png" alt="Dreamteam" />
+        </a>
+        
+        <span class="site-footer-copy">&copy; 2026 Dreamteam AI Inc. All rights reserved.</span>
+        <nav class="site-footer-links" aria-label="Legal">
+          <a href="https://www.dreamteam.ai/legal/privacy-policy">Privacy</a>
+          <a href="https://www.dreamteam.ai/legal/terms-of-service">Terms</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <pagefind-config bundle-path="/api/pagefind/"></pagefind-config>
+  
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Try “pagination” or “create a contact”"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</body>
+</html>
